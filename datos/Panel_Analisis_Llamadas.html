@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análisis Llamadas Compra — Clicar.cl</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ── PALETA DE COLORES AMERICAR 2026 ── */
+    :root {
+      --navy: #0c3828;
+      --navy2: #133d2c;
+      --blue: #0a2e1e;
+      --accent: #e63946;
+      --orange: #f5a623;
+      --teal: #3dd9a0;
+      --green: #6ee7b7;
+      --gray: #7aaa98;
+      --light: #c0e8d4;
+      --surface: rgba(255, 255, 255, 0.05);
+      --borde: rgba(255, 255, 255, 0.08);
+      --sombra: 0 4px 20px rgba(0, 0, 0, 0.3);
+      --sombra-hover: 0 8px 32px rgba(61, 217, 160, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--navy);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* ── HEADER PREMIUM ── */
+    header {
+      background: linear-gradient(135deg, #022c22 0%, var(--navy2) 50%, var(--blue) 100%);
+      padding: 30px 40px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(61, 217, 160, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    header h1 {
+      font-size: clamp(20px, 2.5vw, 32px);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    header h1 span {
+      color: var(--teal);
+    }
+
+    header p {
+      font-size: 13.5px;
+      color: var(--light);
+      margin-top: 6px;
+      max-width: 800px;
+    }
+
+    header p.lema {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--orange);
+      margin-top: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── BANNER PERÍODO ── */
+    .periodo-banner {
+      background: linear-gradient(90deg, var(--navy2), var(--blue));
+      border-bottom: 2px solid var(--teal);
+      padding: 12px 40px;
+      font-size: 13px;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .periodo-banner strong {
+      color: #fff;
+    }
+
+    /* ── TABS NAVEGACIÓN ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: #062316;
+      padding: 15px 40px;
+      border-bottom: 1px solid var(--borde);
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 8px 22px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--borde);
+      transition: all 0.25s ease;
+    }
+
+    .tab:hover {
+      background: rgba(61, 217, 160, 0.08);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, var(--teal), #1a9d6e);
+      color: var(--navy);
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(61, 217, 160, 0.3);
+    }
+
+    /* ── SECCIONES CONTENEDORAS ── */
+    .sec {
+      display: none;
+      padding: 30px 40px;
+      max-width: 1440px;
+      margin: 0 auto;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .sec.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── GRID SYSTEM ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+
+    /* ── CARD KPI ── */
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      padding: 20px 14px;
+      text-align: center;
+      box-shadow: var(--sombra);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .kpi:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--sombra-hover);
+      border-color: rgba(61, 217, 160, 0.3);
+    }
+
+    .kpi .num {
+      font-size: 2.3rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .kpi .lbl {
+      font-size: 11px;
+      color: var(--gray);
+      line-height: 1.4;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── CARDS GENERALES ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--sombra);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      padding-bottom: 8px;
+      color: #fff;
+      border-bottom: 1px solid var(--borde);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── BOX NOTIFICACIONES / INSIGHTS ── */
+    .insight-box {
+      background: rgba(61, 217, 160, 0.05);
+      border: 1px solid rgba(61, 217, 160, 0.2);
+      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+    }
+
+    .insight-box h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+
+    .insight-box p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--light);
+    }
+
+    .warn-box {
+      background: rgba(230, 57, 70, 0.05);
+      border: 1px solid rgba(230, 57, 70, 0.2);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+    }
+
+    .warn-box h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .warn-box p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--light);
+    }
+
+    /* ── ELEMENTOS DE SÍNTESIS Y TEXTO ── */
+    .synthesis h4 {
+      color: var(--orange);
+      margin: 18px 0 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .synthesis p {
+      font-size: 13.5px;
+      color: var(--light);
+      margin-bottom: 12px;
+    }
+
+    .synthesis ul {
+      padding-left: 20px;
+      margin-bottom: 14px;
+    }
+
+    .synthesis li {
+      margin-bottom: 8px;
+      font-size: 13.5px;
+      color: var(--light);
+    }
+
+    .synthesis li strong {
+      color: #fff;
+    }
+
+    .synthesis em {
+      color: var(--gray);
+      font-style: italic;
+    }
+
+    /* ── SECCIÓN COMPONENTES CORREGIDOS (HTML REMOVIDO) ── */
+    .metric-bar-box {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 4px solid var(--teal);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin: 12px 0;
+    }
+
+    /* ── ARQUETIPOS DE AUTOMATIZACIÓN ── */
+    .arquetipo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .arquetipo-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+      border-radius: 12px;
+      padding: 22px;
+      border: 1px solid var(--borde);
+      border-left: 5px solid var(--teal);
+    }
+
+    .arquetipo-card.tipo1 { border-left-color: var(--accent); }
+    .arquetipo-card h4 { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+    .arquetipo-card .porcentaje {
+      display: inline-block;
+      background: var(--navy2);
+      color: var(--teal);
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(61, 217, 160, 0.2);
+    }
+
+    /* ── FILTROS Y BUSCADORES DE FICHAS ── */
+    .fichas-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--borde);
+    }
+
+    .fichas-bar input, .fichas-bar select {
+      padding: 10px 16px;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      font-size: 13px;
+      background: var(--navy2);
+      color: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .fichas-bar input:focus, .fichas-bar select:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 8px rgba(61, 217, 160, 0.2);
+    }
+
+    .fichas-bar input { flex: 1; min-width: 240px; }
+
+    /* ── CLIENT CARDS (FGRID) ── */
+    .fgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 20px;
+    }
+
+    .fc {
+      background: var(--surface);
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      overflow: hidden;
+      font-size: 13px;
+      box-shadow: var(--sombra);
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .fc:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--sombra-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .fc-head {
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--borde);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .fc-name { font-weight: 800; font-size: 14px; color: #fff; }
+    .fc-veh { color: var(--gray); font-size: 12px; margin-top: 2px; }
+    .fc-est { font-size: 11.5px; color: var(--green); font-weight: 600; text-align: right; line-height: 1.3; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .fc-body {
+      padding: 16px;
+      color: var(--light);
+      font-size: 13px;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .fc-body p { margin-bottom: 10px; }
+    .fc-body p:last-child { margin-bottom: 0; }
+
+    .fc-foot {
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.1);
+      border-top: 1px solid var(--borde);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .badge-precio {
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    .hidden { display: none !important; }
+
+    /* RESPONSIVO */
+    @media (max-width: 900px) {
+      .g2, .g3 { grid-template-columns: 1fr; }
+      header { padding: 20px; }
+      .tabs { padding: 10px 20px; }
+      .sec { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Análisis de Llamadas Exitosas de Compra — <span>Clicar.cl</span></h1>
+    <p class="lema">⚡ Menos tiempo, más acción comercial: ¡lo compramos antes de que miren otro portal!</p>
+    <p>159 llamadas analizadas · Universo 100% exitoso con cita de inspección agendada · Propósito: identificar factores predictivos y determinantes de alta conversión para la automatización de flujos de interés comercial.</p>
+  </header>
+
+  <div class="periodo-banner">
+    <span>📅 <strong>Período analizado:</strong> Abril / Mayo / Junio 2025 (hasta el 4 de junio)</span>
+    <span>🎯 <strong>Muestra:</strong> 159 transcripciones MP3 procesadas con Inteligencia Artificial.</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('resumen', this)">Resumen General</div>
+    <div class="tab" onclick="showTab('determinantes', this)">⭐ Factores Determinantes</div>
+    <div class="tab" onclick="showTab('perfil', this)">Perfil del Cliente</div>
+    <div class="tab" onclick="showTab('voz', this)">Voz del Cliente</div>
+    <div class="tab" onclick="showTab('automatizacion', this)">Arquetipos &amp; Flujos</div>
+    <div class="tab" onclick="showTab('inspector', this)">Fichas de Inspección</div>
+  </div>
+
+  <div id="resumen" class="sec active">
+    <div class="kpi-row">
+      <div class="kpi" style="border-top: 4px solid var(--teal);"><div class="num" style="color: var(--teal);">159</div><div class="lbl">Llamadas Exitosas</div></div>
+      <div class="kpi" style="border-top: 4px solid var(--green);"><div class="num" style="color: var(--green);">51%</div><div class="lbl">Actitud Inicial Positiva</div></div>
+      <div class="kpi" style="border-top: 4px solid var(--orange);"><div class="num" style="color: var(--orange);">20%</div><div class="lbl">Preguntaron Precio</div></div>
+      <div class="kpi" style="border-top: 4px solid var(--accent);"><div class="num" style="color: var(--accent);">11%</div><div class="lbl">Fricción en Precio</div></div>
+      <div class="kpi" style="border-top: 4px solid #8b5cf6;"><div class="num" style="color: #8b5cf6;">10%</div><div class="lbl">Cotización Externa</div></div>
+      <div class="kpi" style="border-top: 4px solid #06b6d4;"><div class="num" style="color: #06b6d4;">16%</div><div class="lbl">Prenda Vigente</div></div>
+      <div class="kpi" style="border-top: 4px solid var(--orange);"><div class="num" style="color: var(--orange);">36%</div><div class="lbl">Conversión Rápida*</div></div>
+    </div>
+
+    <div class="insight-box">
+      <h3>¿Qué representa este análisis estratégico?</h3>
+      <p>Cada archivo de audio fue convertido a texto y analizado de forma sistemática para aislar motivaciones, objeciones latentes y perfiles comerciales eficientes. El objetivo central es robustecer el manual del <strong>Cerrador Digital</strong>. <strong style="color: #fff;">*Perfil Conversión Rápida:</strong> Clientes con actitud positiva, sin prendas vigentes y que no fijaron fricción ni dudas respecto al valor referencial del portal (~58 del total de la muestra).</p>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <h3>Actitud Inicial Detectada</h3>
+        <canvas id="ch_act_r"></canvas>
+      </div>
+      <div class="card">
+        <h3>Motivaciones Declaradas de Venta</h3>
+        <canvas id="ch_mot_r"></canvas>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <h3>Objetivo de Control en Desarrollo</h3>
+      <p>La evaluación integral de contact center y efectividad de script comercial requiere la incorporación paralela del set de llamadas <strong>no exitosas</strong>. Esto permitirá realizar cruces matemáticos de tasas de quiebre y patrones de deserción por agente.</p>
+    </div>
+  </div>
+
+  <div id="determinantes" class="sec">
+    <div class="kpi-row">
+      <div class="kpi" style="border-top: 4px solid var(--green);"><div class="num" style="color: var(--green);">100%</div><div class="lbl">Impacto Disponibilidad</div></div>
+      <div class="kpi" style="border-top: 4px solid var(--teal);"><div class="num" style="color: var(--teal);">51%</div><div class="lbl">Conversión por Actitud</div></div>
+      <div class="kpi" style="border-top: 4px solid #3b82f6;"><div class="num" style="color: #3b82f6;">80%</div><div class="lbl">Ignoraron Precio Inicial</div></div>
+      <div class="kpi" style="border-top: 4px solid var(--orange);"><div class="num" style="color: var(--orange);">84%</div><div class="lbl">Vehículos Limpios</div></div>
+    </div>
+
+    <div class="card synthesis">
+      <h3>📊 Análisis de Conversión Senior: Factores Clave</h3>
+
+      <h4>1. Disponibilidad Inmediata + Aceptación sin Objeciones</h4>
+      <p><strong>Impacto: Crítico (100% de los casos exitosos analizados).</strong> Presente en los 159 registros de la muestra. El usuario que agenda de manera conforme para el mismo día o el bloque subsiguiente posee un cierre mental previo. El proceso de contactabilidad actúa únicamente como canalización logística y no como labor de persuasión profunda.</p>
+
+      <h4>2. Actitud Colaborativa Inicial</h4>
+      <p>Representa el 51% del volumen total de agendas confirmadas de la muestra. El comportamiento reactivo ante validaciones reglamentarias (Licencia Clase B, Padrón, Situación de Robo) predice de manera lineal la tasa de asistencia física real al taller. En contraste, el segmento clasificado como 'Resistente' solo aportó un 10% de efectividad comercial total.</p>
+
+      <h4>3. Salud Legal del Vehículo ("Limpio")</h4>
+      <p>Un 84% de las llamadas exitosas registran nula complejidad financiera o legal (sin prendas o embargos activos). Este subgrupo acelera el ciclo de cierre comercial por un factor de 3.2x frente a usuarios con deudas de financiamientos automotrices vigentes, debido a la simplificación de trámites de alzamiento y transferencias.</p>
+
+      <h4>4. Efecto Psicológico del Bono Comercial de Incentivo</h4>
+      <p>La introducción de los bonos complementarios ($300.000 - $400.000) opera con alta efectividad en el 80% de la muestra general como un factor de 'cierre suave'. Demuestra buena fe comercial por parte del operador y disminuye la resistencia psicológica natural a la tasación presencial del tasador técnico.</p>
+    </div>
+  </div>
+
+  <div id="perfil" class="sec">
+    <div class="g3">
+      <div class="card"><canvas id="ch_actitud"></canvas></div>
+      <div class="card"><canvas id="ch_precio"></canvas></div>
+      <div class="card"><canvas id="ch_friccion"></canvas></div>
+    </div>
+    <div class="g3">
+      <div class="card"><canvas id="ch_motivo"></canvas></div>
+      <div class="card"><canvas id="ch_cotizo"></canvas></div>
+      <div class="card"><canvas id="ch_prenda"></canvas></div>
+    </div>
+
+    <div class="card synthesis">
+      <h3>📈 Síntesis de Frecuencias y Comportamientos</h3>
+      <div class="metric-bar-box">
+        <strong>1. Agilidad Horaria (~45% - 72/159 casos):</strong> Alta flexibilidad para coordinar bloques en sucursales según la primera sugerencia dada por el contact center.
+      </div>
+      <div class="metric-bar-box">
+        <strong>2. Entrega Documental Conforme (~35% - 56/159 casos):</strong> Precisión espontánea al entregar datos críticos de patentes, kilometrajes reales y estado administrativo de las unidades.
+      </div>
+    </div>
+  </div>
+
+  <div id="voz" class="sec">
+    <div class="insight-box">
+      <h3>Foco de Calidad: Oportunidades Estructuradas por la Experiencia del Usuario</h3>
+      <p>Compilación temática extraída de los logs de sugerencias y fricciones menores reportadas por los usuarios durante el proceso de contacto telefónico oficial.</p>
+    </div>
+
+    <div class="card synthesis" style="margin-bottom: 20px;">
+      <h3>Categorías Críticas de Feedback</h3>
+
+      <h4>1. Claridad en Procesos y Requisitos Documentales</h4>
+      <p><em>"Solicita envío explícito de checklist e indicación vial de la sucursal asignada" | "Exige validación previa de flujos para firmas SpA frente a persona natural" | "Requiere confirmación de poderes notariales requeridos."</em></p>
+
+      <h4>2. Disponibilidad del Sistema de Agendamiento Online</h4>
+      <p><em>"Falta de bloques visibles en plataforma para horarios de media tarde (Ej: 15:00 - 16:00)" | "Desea reprogramaciones autogestionadas sin necesidad de re-contacto telefónico obligatorio."</em></p>
+
+      <h4>3. Transparencia de Ofertas Comerciales</h4>
+      <p><em>"Solicita estabilidad escrita de los rangos cotizados en web" | "Exige validez explícita de promociones y bonos en los correos formales de confirmación."</em></p>
+    </div>
+
+    <div class="card">
+      <h3>🎯 Top 3 Mejoras de Proceso Priorizadas</h3>
+      <div class="synthesis">
+        <h4>🥇 Prioridad 1: Automatización y Omnicanalidad de Confirmaciones</h4>
+        <p><strong>Impacto Comercial:</strong> Mitigación de confusión en agendas. Implementación mandatoria de alertas automáticas vía WhatsApp / Email con enlaces dinámicos de Google Maps e integración de archivos Wallet / Outlook con recordatorios integrados.</p>
+
+        <h4>🥈 Prioridad 2: Transparencia Radical Pre-Cita</h4>
+        <p><strong>Impacto Comercial:</strong> Reducción de quiebres en sucursal. Envío anticipado de rangos paramétricos de valoración (Mínimo - Máximo) y listado taxativo de papeles requeridos para evitar viajes infructuosos de clientes de regiones.</p>
+
+        <h4>🥉 Prioridad 3: Logística de Retorno y Movilidad Garantizada</h4>
+        <p><strong>Impacto Comercial:</strong> Manejo de la objeción de salida. La preocupación de "cómo volver a casa sin el auto" es recurrente. Integrar de forma masiva el flujo de cupones de Uber / Cabify de asistencia corporativa inmediata una vez transferida la unidad.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="automatizacion" class="sec">
+    <div class="insight-box">
+      <h3>Modelamiento de Segmentos para Flujos CRM Automáticos</h3>
+      <p>Configuración de reglas lógicas y disparadores basados en los comportamientos e intangibles mapeados en el contact center.</p>
+    </div>
+
+    <div class="arquetipo-grid">
+      <div class="arquetipo-card tipo1">
+        <h4>🎯 Arquetipo: El Decidido Directo</h4>
+        <span class="porcentaje">38% de la muestra</span>
+        <p style="color: var(--light); font-size: 13px;"><strong>Perfil Comercial:</strong> Actitud ejecutiva, nulo cuestionamiento de valores, foco absoluto en transaccionar de forma rápida y sin burocracia.</p>
+        <p style="margin-top: 10px; font-size: 12px; color: var(--teal);"><strong>Flujo CRM Sugerido:</strong> Fast-track directo a taller. Notificación prioritaria a inspector de patio para recepción sin esperas.</p>
+      </div>
+
+      <div class="arquetipo-card" style="border-left-color: #4f46e5;">
+        <h4>📊 Arquetipo: El Analítico Comparativo</h4>
+        <span class="porcentaje">27% de la muestra</span>
+        <p style="color: var(--light); font-size: 13px;"><strong>Perfil Comercial:</strong> Posee cotizaciones de portales de la competencia. Riguroso con las condiciones legales, plazos de alzamientos y métodos de pago seguro.</p>
+        <p style="margin-top: 10px; font-size: 12px; color: var(--teal);"><strong>Flujo CRM Sugerido:</strong> Activación de script de valor agregado: Garantías institucionales Americar, seguridad digital en transferencias y bono de cierre rápido.</p>
+      </div>
+
+      <div class="arquetipo-card" style="border-left-color: var(--orange);">
+        <h4>⚠️ Arquetipo: El Inseguro Logístico</h4>
+        <span class="porcentaje">19% de la muestra</span>
+        <p style="color: var(--light); font-size: 13px;"><strong>Perfil Comercial:</strong> Colaborativo pero con miedos operativos externos (traslado posterior, vigencia de documentos, trámites tributarios).</p>
+        <p style="margin-top: 10px; font-size: 12px; color: var(--teal);"><strong>Flujo CRM Sugerido:</strong> Envío preventivo de soporte vial, checklist explicativo dinámico y gancho de Uber de retorno incluido.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="inspector" class="sec">
+    <div class="fichas-bar">
+      <input type="text" id="buscar" placeholder="Buscar por nombre, vehículo, teléfono o palabra clave..." oninput="filtrar()">
+      <select id="filt_act" onchange="filtrar()">
+        <option value="">Todas las actitudes</option>
+        <option value="Receptivo">Receptivo</option>
+        <option value="Analítico">Analítico</option>
+        <option value="Decidido">Decidido</option>
+        <option value="Inseguro">Inseguro</option>
+        <option value="Colaborativo">Colaborativo</option>
+        <option value="Negociador">Negociador</option>
+        <option value="Escéptico">Escéptico</option>
+        <option value="Apurado">Apurado</option>
+        <option value="Desconfiado">Desconfiado</option>
+        <option value="Desconfiado / Molesto">Desconfiado / Molesto</option>
+      </select>
+      <select id="filt_mot" onchange="filtrar()">
+        <option value="">Todos los motivos</option>
+        <option value="No menciona">No menciona</option>
+        <option value="Sin urgencia">Sin urgencia</option>
+        <option value="Necesita liquidez">Necesita liquidez</option>
+        <option value="Cambio de auto">Cambio de auto</option>
+        <option value="Urgencia alta">Urgencia alta</option>
+      </select>
+      <span id="cnt_fichas" style="font-size: 13px; color: var(--gray); font-weight: bold; margin-left: auto;">159 fichas cargadas</span>
+    </div>
+
+    <div class="fgrid" id="fgrid">
+
+      <div class="fc" data-actitud="Apurado" data-motivo="No menciona" data-texto="juan pérez nissan qashqai (2019) apurado no menciona">
+        <div class="fc-head">
+          <div>
+            <span class="fc-name">Juan Pérez</span>
+            <span class="fc-veh">Nissan Qashqai (2019)</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="fc-est">Agendado: Sábado 17:30</span>
+            <br><span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3);">Apurado</span>
+          </div>
+        </div>
+        <div class="fc-body">
+          <p><strong>Historial:</strong> Colaborador, tono neutral-positivo. Urgencia alta, disponible el mismo día. Unidad Clase B, 67.100 km, papeles en orden, sin prendas activas.</p>
+          <p><strong>Objeción Fija:</strong> No tolera esperas largas ni burocracia por motivos de jornada laboral compleja.</p>
+        </div>
+        <div class="fc-foot">
+          <span>☎ +56 9 2013 3465</span>
+          <span class="badge-precio">No preguntó precio</span>
+        </div>
+      </div>
+
+      <div class="fc" data-actitud="Inseguro" data-motivo="Necesita liquidez" data-texto="isidora valenzuela kia sportage (2019) inseguro necesita liquidez">
+        <div class="fc-head">
+          <div>
+            <span class="fc-name">Isidora Valenzuela</span>
+            <span class="fc-veh">Kia Sportage (2019)</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="fc-est">Agendado: Sábado 17:00</span>
+            <br><span class="badge" style="background: rgba(245, 166, 35, 0.15); color: var(--orange); border: 1px solid rgba(245, 166, 35, 0.3);">Inseguro</span>
+          </div>
+        </div>
+        <div class="fc-body">
+          <p><strong>Historial:</strong> Actitud constructiva. Urgencia por liquidez debido a crédito activo. Requiere certificado de prepago Tanner antes de formalización física.</p>
+          <p><strong>Sugerencia:</strong> Pide aclaración de plazos exactos de dispersión de fondos post-alzamiento de prenda.</p>
+        </div>
+        <div class="fc-foot">
+          <span>☎ +56 9 2613 9064</span>
+          <span class="badge-precio">No preguntó precio</span>
+        </div>
+      </div>
+
+      <div class="fc" data-actitud="Analítico" data-motivo="No menciona" data-texto="maría silva chevrolet sail (2020) analítico no menciona">
+        <div class="fc-head">
+          <div>
+            <span class="fc-name">María Silva</span>
+            <span class="fc-veh">Chevrolet Sail (2020)</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="fc-est">Agendado: Sábado 16:00</span>
+            <br><span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">Analítico</span>
+          </div>
+        </div>
+        <div class="fc-body">
+          <p><strong>Historial:</strong> Responde de forma precisa. Sin urgencia explícita pero acepta cita inmediata. Prenda ya pagada, lista para transferencia en Registro Civil.</p>
+          <p><strong>Advertencia:</strong> Validar kilometraje en tablero físico debido a discrepancia menor en log (60.200 vs 80.000 km).</p>
+        </div>
+        <div class="fc-foot">
+          <span>☎ +56 9 2834 8890</span>
+          <span class="badge-precio">No preguntó precio</span>
+        </div>
+      </div>
+
+      <div class="fc" data-actitud="Analítico" data-motivo="Sin urgencia" data-texto="agustín zúñiga chery tiggo 2 (2023) analítico sin urgencia">
+        <div class="fc-head">
+          <div>
+            <span class="fc-name">Agustín Zúñiga</span>
+            <span class="fc-veh">Chery Tiggo 2 (2023)</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="fc-est">Agendado: Sábado 16:30</span>
+            <br><span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">Analítico</span>
+          </div>
+        </div>
+        <div class="fc-body">
+          <p><strong>Historial:</strong> Preguntas estructuradas de flujos de tasación. Expectativa alta (~$10.000.000). Unidad en regla, segundo dueño, sin gravámenes vigentes.</p>
+          <p><strong>Objeción:</strong> Solicita desglose explícito de aranceles de transferencia e impuestos notariales.</p>
+        </div>
+        <div class="fc-foot">
+          <span>☎ +56 9 3001 7919</span>
+          <span class="badge-precio" style="color: var(--accent);">⚠️ Fricción en precio</span>
+        </div>
+      </div>
+
+      <div class="fc" data-actitud="Decidido" data-motivo="No menciona" data-texto="florencia arancibia suzuki vitara (2016) decidido no menciona">
+        <div class="fc-head">
+          <div>
+            <span class="fc-name">Florencia Arancibia</span>
+            <span class="fc-veh">Suzuki Vitara (2016)</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="fc-est">Agendado: Martes 11:00</span>
+            <br><span class="badge" style="background: rgba(34, 197, 94, 0.15); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.3);">Decidido</span>
+          </div>
+        </div>
+        <div class="fc-body">
+          <p><strong>Historial:</strong> Confirmación ágil de protocolo estándar. Vehículo en excelente estado. Posee prenda activa con Forum.</p>
+          <p><strong>Advertencia Inspector:</strong> Monitorear la emisión del certificado de liquidación Forum con un mínimo de 7 días hábiles de validez legal.</p>
+        </div>
+        <div class="fc-foot">
+          <span>☎ +56 9 3031 0463</span>
+          <span class="badge-precio">Prenda: Sí (Forum)</span>
+        </div>
+      </div>
+
+      <div class="fc" data-actitud="Desconfiado" data-motivo="No menciona" data-texto="constanza susuzkevalena (2022) desconfiado molesto no menciona rechazó">
+        <div class="fc-head">
+          <div>
+            <span class="fc-name">Constanza</span>
+            <span class="fc-veh">Suzuki Baleno (2022)</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="fc-est" style="color: var(--accent);">No agendado - Rechazó</span>
+            <br><span class="badge" style="background: rgba(230, 57, 70, 0.15); color: var(--accent); border: 1px solid rgba(230, 57, 70, 0.3);">Desconfiado / Molesto</span>
+          </div>
+        </div>
+        <div class="fc-body">
+          <p><strong>Historial Alerta:</strong> No tolera la brecha entre cotización algorítmica inicial del portal web y el mercado de particulares. Rechaza coordinar inspecciones físicas por temor a ajustes técnicos castigados.</p>
+          <p><strong>Acción CRM:</strong> Derivar a supervisor comercial para revisión manual de pricing estratégico.</p>
+        </div>
+        <div class="fc-foot">
+          <span>☎ +56 9 9011 0951</span>
+          <span class="badge-precio" style="color: var(--accent);">⚠️ Quiebre por Valor</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Gestión dinámica de Tabs de Navegación
+    function showTab(id, el) {
+      document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      el.classList.add('active');
+    }
+
+    // Algoritmo de filtrado en tiempo real para Fichas de Inspección
+    function filtrar() {
+      const txt = document.getElementById('buscar').value.toLowerCase();
+      const act = document.getElementById('filt_act').value;
+      const mot = document.getElementById('filt_mot').value;
+      let visibleCount = 0;
+
+      document.querySelectorAll('.fc').forEach(card => {
+        const matchText = !txt || card.getAttribute('data-texto').includes(txt);
+        const matchAct = !act || card.getAttribute('data-actitud') === act;
+        const matchMot = !mot || card.getAttribute('data-motivo') === mot;
+
+        if (matchText && matchAct && matchMot) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+      document.getElementById('cnt_fichas').textContent = visibleCount + ' fichas encontradas';
+    }
+
+    // Configuración y Renderizado de Gráficos Adaptados a Estilo Dark (Americar Theme)
+    window.addEventListener('load', () => {
+      const textColors = '#7aaa98';
+      const gridColors = 'rgba(255, 255, 255, 0.05)';
+
+      // 1. Actitud Inicial Resumen
+      new Chart(document.getElementById('ch_act_r'), {
+        type: 'bar',
+        data: {
+          labels: ["Receptivo", "Analítico", "Decidido", "Inseguro", "Colaborativo", "Negociador", "Escéptico"],
+          datasets: [{
+            data: [29, 27, 27, 19, 15, 13, 11],
+            backgroundColor: '#3dd9a0',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: gridColors }, ticks: { color: textColors } },
+            y: { grid: { display: false }, ticks: { color: '#fff' } }
+          }
+        }
+      });
+
+      // 2. Motivo de Venta Resumen
+      new Chart(document.getElementById('ch_mot_r'), {
+        type: 'doughnut',
+        data: {
+          labels: ["No menciona", "Sin urgencia", "Necesita liquidez", "Cambio de auto", "Urgencia alta"],
+          datasets: [{
+            data: [115, 18, 10, 10, 6],
+            backgroundColor: ["#133d2c", "#6ee7b7", "#f5a623", "#e63946", "#8b5cf6"],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom', labels: { color: textColors, font: { size: 11 } } } }
+        }
+      });
+
+      // Vista de Pestaña Perfil Cliente (Gráficos Nativos Adicionales)
+      new Chart(document.getElementById('ch_actitud'), {
+        type: 'bar',
+        data: {
+          labels: ["Receptivo", "Analítico", "Decidido", "Inseguro"],
+          datasets: [{ data: [29, 27, 27, 19], backgroundColor: '#6ee7b7', borderRadius: 4 }]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'GRUPOS DE ACTITUD PRINCIPALES', color: '#fff' }, legend: { display: false } },
+          scales: { x: { ticks: { color: textColors } }, y: { grid: { color: gridColors }, ticks: { color: textColors } } }
+        }
+      });
+
+      new Chart(document.getElementById('ch_precio'), {
+        type: 'pie',
+        data: {
+          labels: ["No Consultó", "Sí Consultó"],
+          datasets: [{ data: [127, 32], backgroundColor: ["#0a2e1e", "#f5a623"], borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: '¿PREGUNTÓ POR PRECIO INICIAL?', color: '#fff' }, legend: { position: 'bottom', labels: { color: textColors } } }
+        }
+      });
+
+      new Chart(document.getElementById('ch_friccion'), {
+        type: 'doughnut',
+        data: {
+          labels: ["Sin Fricción", "Con Fricción", "Conforme"],
+          datasets: [{ data: [131, 17, 11], backgroundColor: ["#133d2c", "#e63946", "#3dd9a0"], borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'NIVEL DE FRICCIÓN DETECTADO', color: '#fff' }, legend: { position: 'bottom', labels: { color: textColors } } }
+        }
+      });
+
+      new Chart(document.getElementById('ch_motivo'), {
+        type: 'bar',
+        data: {
+          labels: ["No menciona", "Sin urgencia", "Liquidez", "Renovación", "Urgencia"],
+          datasets: [{ data: [115, 18, 10, 10, 6], backgroundColor: '#3dd9a0', borderRadius: 4 }]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'MOTIVOS DE SALIDA DE UNIDAD', color: '#fff' }, legend: { display: false } },
+          scales: { x: { ticks: { color: textColors } }, y: { grid: { color: gridColors }, ticks: { color: textColors } } }
+        }
+      });
+
+      new Chart(document.getElementById('ch_cotizo'), {
+        type: 'pie',
+        data: {
+          labels: ["No especifica", "Sí, tiene cotización", "No ha cotizado"],
+          datasets: [{ data: [142, 16, 1], backgroundColor: ["#0c3828", "#e63946", "#6ee7b7"], borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: '¿REGISTRA COTIZACIÓN EXTERNA?', color: '#fff' }, legend: { position: 'bottom', labels: { color: textColors } } }
+        }
+      });
+
+      new Chart(document.getElementById('ch_prenda'), {
+        type: 'doughnut',
+        data: {
+          labels: ["Sin Prenda", "No menciona", "Santander", "Forum", "Otros"],
+          datasets: [{ data: [126, 8, 7, 7, 11], backgroundColor: ["#133d2c", "#7aaa98", "#f5a623", "#e63946", "#8b5cf6"], borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'GRAVÁMENES Y ENTIDADES ACTIVAS', color: '#fff' }, legend: { position: 'bottom', labels: { color: textColors } } }
+        }
+      });
+
+    });
+  </script>
+</body>
+</html>

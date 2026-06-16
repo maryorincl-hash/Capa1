@@ -1,0 +1,18 @@
+# Archivos de audio (demasiado grandes y datos privados)
+llamadas_capa1/
+llamadas_capa2/
+llamadas/
+*.mp3
+
+# Progreso con transcripciones (datos sensibles de clientes)
+datos/.progreso_*.json
+
+# Excel con transcripciones completas (datos sensibles)
+datos/Analisis_Capa1_No_Agendo.xlsx
+datos/Analisis_Llamadas_Completo.xlsx
+datos/Analisis_Llamadas_Limpio.xlsx
+
+# Python
+__pycache__/
+*.pyc
+.env

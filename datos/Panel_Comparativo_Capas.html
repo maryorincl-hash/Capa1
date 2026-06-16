@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Panel Comparativo de Conversión — Clicar.cl</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:#1e293b}
+header{background:linear-gradient(135deg,#1e3a5f,#1d4ed8);color:#fff;padding:20px 28px}
+header h1{font-size:1.25rem;font-weight:800}header p{font-size:.8rem;opacity:.85;margin-top:4px}
+.estado-bar{background:#fff;padding:10px 24px;border-bottom:1px solid #e2e8f0;
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.estado-bar span.lbl{font-size:.78rem;color:#64748b;margin-right:4px}
+.tabs{display:flex;gap:4px;background:#fff;padding:8px 18px;border-bottom:1px solid #e2e8f0;
+  overflow-x:auto;white-space:nowrap}
+.tab{padding:7px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600;
+  color:#64748b;border:1px solid transparent;white-space:nowrap}
+.tab:hover{background:#f1f5f9}.tab.active{background:#1d4ed8;color:#fff}
+.sec{display:none;padding:20px;max-width:1440px;margin:0 auto}.sec.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.kpi{background:#fff;border-radius:10px;padding:12px;text-align:center;box-shadow:0 1px 4px #0001;
+  border-top:3px solid transparent}
+.kpi .num{font-size:1.8rem;font-weight:800}.kpi .lbl{font-size:.72rem;color:#64748b;margin-top:2px;line-height:1.3}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 4px #0001;margin-bottom:14px}
+.card h3{font-size:.88rem;font-weight:700;margin-bottom:12px;color:#1e293b;
+  border-bottom:2px solid #1d4ed8;padding-bottom:5px}
+.card canvas{max-height:230px}
+.insight{border-left:5px solid;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:14px}
+.insight h3{font-size:.88rem;font-weight:700;margin-bottom:8px}
+.insight p{font-size:.83rem;line-height:1.6}
+.synthesis{background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 4px #0001;
+  line-height:1.65;font-size:.85rem}
+.synthesis h4{color:#1d4ed8;margin:12px 0 5px;font-size:.88rem}
+.synthesis ul{padding-left:16px}.synthesis li{margin-bottom:4px}
+.capa-header{padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;
+  align-items:center;gap:12px}
+.capa-header .num{font-size:2.5rem;font-weight:900;opacity:.15}
+.capa-header .info h2{font-size:1rem;font-weight:700}.capa-header .info p{font-size:.8rem;opacity:.85}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Panel Comparativo de Conversión — Clicar.cl</h1>
+  <p>Análisis de las 3 capas del embudo: contacto / agendamiento / compra · ABR-JUN 2025</p>
+</header>
+
+<div class="estado-bar">
+  <span class="lbl">Estado de datos:</span>
+  <span style="background:#fef2f2;color:#991b1b;border:1px solid #dc262640;
+              padding:4px 10px;border-radius:99px;font-size:.78rem;font-weight:600">
+              ❌ Capa 1: 100 registros</span><span style="background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0;
+          padding:4px 10px;border-radius:99px;font-size:.78rem;font-weight:600">
+          ⏳ Capa 2: sin datos</span><span style="background:#eff6ff;color:#1e40af;border:1px solid #2563eb40;
+              padding:4px 10px;border-radius:99px;font-size:.78rem;font-weight:600">
+              ✅ Capa 3: 159 registros</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('embudo',this)">🔽 Embudo</div>
+  <div class="tab" onclick="showTab('c1',this)">✅ Capa 1 — No agendó (100)</div>
+  <div class="tab" onclick="showTab('c2',this)">⏳ Capa 2 — No compró</div>
+  <div class="tab" onclick="showTab('c3',this)">✅ Capa 3 — Compra exitosa (159)</div>
+  <div class="tab" onclick="showTab('comp',this)">📊 Comparación</div>
+</div>
+
+<!-- ── EMBUDO ── -->
+<div id="embudo" class="sec active">
+  <div class="kpi-row">
+    <div class="kpi" style="border-color:#dc2626">
+          <div class="num" style="color:#dc2626">100</div>
+          <div class="lbl">Atendieron<br>no agendaron</div></div>
+    <div class="kpi" style="border-color:#d97706">
+          <div class="num" style="color:#d97706">?</div>
+          <div class="lbl">Agendaron<br>no compraron</div></div>
+    <div class="kpi" style="border-color:#2563eb">
+          <div class="num" style="color:#2563eb">159</div>
+          <div class="lbl">Agendaron<br>y compraron</div></div>
+    <div class="kpi" style="border-color:#8b5cf6">
+          <div class="num" style="color:#8b5cf6">61%</div>
+          <div class="lbl">Tasa de<br>agendamiento</div></div>
+    <div class="kpi" style="border-color:#22c55e">
+          <div class="num" style="color:#22c55e">100%</div>
+          <div class="lbl">Tasa de cierre<br>desde cita</div></div>
+    <div class="kpi" style="border-color:#64748b">
+          <div class="num" style="color:#64748b">259</div>
+          <div class="lbl">Total llamadas<br>analizadas</div></div>
+  </div>
+  <div class="card">
+    <h3>Distribución por capa</h3>
+    <canvas id="ch_embudo" style="max-height:180px"></canvas>
+  </div>
+  <div class="g2">
+    <div class="card"><h3>Grupos de Actitud por Capa (%)</h3><canvas id="ch_grupos_act"></canvas></div>
+    <div class="card">
+      <h3>Interpretación del embudo</h3>
+      <div class="synthesis">```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Análisis Comparativo - Llamadas de Compra Clicar.cl</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #1a73e8; border-bottom: 3px solid #1a73e8; padding-bottom: 10px; }
+        h4 { color: #d32f2f; margin-top: 25px; }
+        .metrica { background-color: #f0f7ff; padding: 12px; border-left: 4px solid #1a73e8; margin: 10px 0; }
+        ul { margin: 15px 0; padding-left: 25px; }
+        li { margin: 10px 0; line-height: 1.6; }
+        .protocolo { background-color: #fff3e0; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        .paso { background-color: white; padding: 12px; margin: 10px 0; border-left: 4px solid #f57c00; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 Análisis Comparativo: Capas de Llamadas Clicar.cl</h2>
+    
+    <h4>🔍 Diferencias Clave entre Capa 1 (Sin Agenda) y Capa 3 (Compradores)</h4>
+    
+    <ul>
+        <li>
+            <strong>1. Actitud Positiva - Brecha de 8 puntos porcentuales</strong>
+            <div class="metrica">
+                • Capa 1 (No agenda): 59% actitud positiva<br>
+                • Capa 3 (Compra): 51% actitud positiva<br>
+                <strong>Insight:</strong> Paradójicamente, quienes NO agendan muestran más optimismo inicial. Los compradores reales filtraban más rigurosamente desde el inicio, priorizando conveniencia sobre entusiasmo.
+            </div>
+        </li>
+        
+        <li>
+            <strong>2. Resistencia - Aumento de 2 puntos (8% vs 10%)</strong>
+            <div class="metrica">
+                • Capa 1: 8% resistente<br>
+                • Capa 3: 10% resistente<br>
+                <strong>Insight:</strong> Los compradores finales tenían objeciones manejables. La resistencia fue SUPERADA en el proceso de venta, indicando que el equipo de seguimiento fue efectivo con esta capa.
+            </div>
+        </li>
+        
+        <li>
+            <strong>3. Neutralidad - Diferencia crítica de 13 puntos</strong>
+            <div class="metrica">
+                • Capa 1: 25% neutral<br>
+                • Capa 3: 38% neutral<br>
+                <strong>Insight:</strong> Los compradores mostraban más cautela inicial (menos euforia, más evaluación). La neutralidad = análisis racional del producto. Este perfil es más CONVERTIBLE que el entusiasta que no actúa.
+            </div>
+        </li>
+        
+        <li>
+            <strong>4. Perfil Psicográfico del Comprador</strong>
+            <div class="metrica">
+                <strong>Capa 3 (Compradores):</strong> 51% positivos + 38% neutrales = 89% receptivos<br>
+                <strong>Capa 1 (Sin agenda):</strong> 59% positivos + 25% neutrales = 84% receptivos<br>
+                <strong>Insight:</strong> Aunque la receptividad es similar, la CALIDAD es diferente. Capa 3 = decisores. Capa 1 = soñadores. La ratio positivos:neutrales de Capa 3 (1.34:1) indica equilibrio entre entusiasmo y pragmatismo.
+            </div>
+        </li>
+    </ul>
+
+    <h2>⚡ Protocolo de Acción Rápida para Alto Interés</h2>
+    
+    <div class="protocolo">
+        <h4>Activación en 4 Pasos (máximo 72 horas)</h4>
+        
+        <div class="paso">
+            <strong>PASO 1: Identificación Inmediata (0-15 min)</strong><br>
+            Cuando detectes cliente con actitud neutral-positiva (38-51% range):<br>
+            • Pregunta clave: "¿Qué aspecto específico del auto te preocupa?"<br>
+            • Si responde con objeciones claras → ALTA probabilidad de compra<br>
+            • Documenta el concern en el CRM con etiqueta "DECISOR-ACTIVO"
+        </div>
+        
+        <div class="paso">
+            <strong>PASO 2: Validación de Necesidad (15-30 min)</strong><br>
+            Evita overselling. Prueba con preguntas de confirmación:<br>
+            • "¿Para cuándo necesitas el vehículo?"<br>
+            • "¿Ya visitaste el sitio o es primera vez?"<br>
+            • Si tiene timeline definido = potencial comprador (Capa 3)<br>
+            • Si vago/lejano = probablemente Capa 1
+        </div>
+        
+        <div class="paso">
+            <strong>PASO 3: Agendar + Incentivo Inmediato (30-45 min)</strong><br>
+            NO esperes seguimiento posterior:<br>
+            • Agenda test drive en próximas 48 horas<br>
+            • Ofrece descuento único por "agendar hoy" (ej: "Lleva garantía adicional si confirmas esta semana")<br>
+            • Envía confirmación por WhatsApp con foto del auto específico<br>
+            • Asigna ejecutivo de venta antes del cierre de llamada
+        </div>
+        
+        <div class="paso">
+            <strong>PASO 4: Follow-up Diferenciado (24-48 horas)</strong><br>
+            Según actitud detectada:<br>
+            • <strong>Neutrales (38%):</strong> Envía comparativa de autos + análisis de valor<br>
+            • <strong>Positivos (51%):</strong> Mensaje personal del ejecutivo + facilidades de financiamiento<br>
+            • <strong>Resistentes (10%):</strong</div>
+    </div>
+  </div>
+  <div class="insight" style="background:#f0fdf4;border-color:#22c55e">
+    <h3 style="color:#166534">¿Qué representa cada capa?</h3>
+    <p>
+      <strong style="color:#dc2626">Capa 1 (rojo)</strong> — El agente logró que el cliente atendiera, pero no cerró la cita.
+      Permite evaluar habilidades de negociación y manejo de objeciones del contact center.<br>
+      <strong style="color:#d97706">Capa 2 (naranja)</strong> — El agente agendó la cita, pero el cliente no compró.
+      Permite analizar qué fricción comercial (precio, desconfianza, prenda) ocurrió en la visita y si había señales en la llamada.<br>
+      <strong style="color:#2563eb">Capa 3 (azul)</strong> — Conversiones exitosas.
+      Base de comportamiento ideal para construir el proceso de validación de alto interés.
+    </p>
+  </div>
+</div>
+
+<!-- ── CAPA 1 ── -->
+<div id="c1" class="sec">
+  <div class="capa-header" style="background:#fef2f2;color:#991b1b">
+    <div class="num">1</div>
+    <div class="info">
+      <h2>❌ Capa 1 — Cliente atiende pero NO agenda cita</h2>
+      <p>Objetivo: evaluar gestión del contact center · Habilidades de negociación y manejo de objeciones</p>
+    </div>
+  </div>
+  
+  <div class="kpi-row">
+    <div class="kpi" style="border-color:#dc2626">
+          <div class="num" style="color:#dc2626">100</div>
+          <div class="lbl">Llamadas<br>sin agendamiento</div></div>
+    <div class="kpi" style="border-color:#22c55e">
+          <div class="num" style="color:#22c55e">59</div>
+          <div class="lbl">% Actitud<br>positiva inicial</div></div>
+    <div class="kpi" style="border-color:#ef4444">
+          <div class="num" style="color:#ef4444">8</div>
+          <div class="lbl">% Actitud<br>resistente</div></div>
+    <div class="kpi" style="border-color:#f59e0b">
+          <div class="num" style="color:#f59e0b">97</div>
+          <div class="lbl">% Manejo objeción<br>Regular o Deficiente</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><h3>Actitud Inicial</h3><canvas id="ch_c1_act"></canvas></div>
+    <div class="card"><h3>Calidad del Manejo de Objeción</h3><canvas id="ch_c1_ca"></canvas></div>
+  </div>
+  <div class="g2">
+    <div class="card"><h3>Nivel de Negociación Requerido</h3><canvas id="ch_c1_nv"></canvas></div>
+    <div class="card"><h3>Objeción Principal</h3><canvas id="ch_c1_ob"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Análisis — Gestión del Contact Center</h3>
+    <div class="synthesis">```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Llamadas sin Agendamiento - clicar.cl</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #d32f2f;
+            border-bottom: 3px solid #d32f2f;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        h4 {
+            color: #1565c0;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        ul {
+            margin: 0;
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-left: 4px solid #1565c0;
+            border-radius: 3px;
+        }
+        .stat-box {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff6f00;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+        .critical {
+            background-color: #ffebee;
+            border-left-color: #d32f2f;
+        }
+        .success {
+            background-color: #e8f5e9;
+            border-left-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📊 Análisis de 100 Llamadas sin Agendamiento</h2>
+        <p><strong>Plataforma:</strong> clicar.cl | <strong>Métrica Crítica:</strong> 93% de deficiente manejo de objeciones</p>
+
+        <div class="stat-box critical">
+            <strong>⚠️ Hallazgo Crítico:</strong> El 93% de las llamadas sin agendamiento presenta deficiente gestión de objeciones. Esto representa una oportunidad enorme de mejora.
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>🚨 Los 3 Principales Errores de Gestión Detectados</h2>
+
+        <h4>1. Aceptación Pasiva de la Negativa sin Indagación</h4>
+        <ul>
+            <li><strong>Descripción:</strong> El agente recibe un "No" o una objeción y acepta inmediatamente sin hacer preguntas de profundización.</li>
+            <li><strong>Evidencia en datos:</strong> "El agente aceptó inmediatamente sin indagar causas", "sin intentar revertir la decisión", "sin profundizar en la barrera real".</li>
+            <li><strong>Impacto:</strong> Se pierden oportunidades de negociación en casos donde el cliente tiene resistencias vencibles (disponibilidad, distancia, información incompleta).</li>
+            <li><strong>Ejemplos reales:</strong>
+                <ul>
+                    <li>Cliente dice "no tengo mis manos" → agente acepta sin preguntar qué significa o si hay alternativa.</li>
+                    <li>Cliente dice "estoy ocupado" → agente no propone mejor horario.</li>
+                    <li>Cliente dice "no" sin motivos → agente no investiga la causa real.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>2. Falta de Exploración de Barreras Reales (Geográficas, Logísticas, Económicas)</h4>
+        <ul>
+            <li><strong>Descripción:</strong> El agente no profundiza en las objeciones logísticas o externas que podrían tener soluciones creativas.</li>
+            <li><strong>Evidencia en datos:</strong> 38 casos con nivel de negociación "Alto" requerían manejo estratégico pero recibieron gestión deficiente.</li>
+            <li><strong>Impacto:</strong> Clientes con barreras geográficas (La Serena/Coquimbo vs. Santiago) o logísticas ("tengo que llevar yo el auto") abandonan sin explorar alternativas (horarios extendidos, sucursales alternativas, coordinación de traslado).</li>
+            <li><strong>Ejemplos reales:</strong>
+                <ul>
+                    <li>Distancia geográfica insalvable: cliente no visita sucursal. Agent no ofrece inspección a domicilio o coordinación logística.</li>
+                    <li>Cliente requiere llevar auto él mismo: agente no ofrece acompañamiento o traslado asistido.</li>
+                    <li>Disponibilidad limitada: agente no propone múltiples franjas horarias o atención extendida (sábado/domingo).</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>3. Ausencia de Reencuadre de Valor y Argumentación Comercial</h4>
+        <ul>
+            <li><strong>Descripción:</strong> El agente no articula el valor de la propuesta ni reposiciona la inspección como beneficio para el cliente.</li>
+            <li><strong>Evidencia en datos:</strong> Niveles de negociación "Alto" no corresponden a argumentación de valor diferencial, sino a aceptación de barreras.</li>
+            <li><strong>Impacto:</strong> Clientes desinteresados o escepticos (11 casos) no reciben argumentación que los reconecte con la necesidad. No se aborda "por qué importa valorizar tu vehículo".</li>
+            <li><strong>Ejemplos reales:</strong>
+                <ul>
+                    <li>Cliente desconfiado: agente no construye credibilidad ni explica ventajas de tasación profesional.</li>
+                    <li>Cliente con oferta competitiva: agente no diferencia propuesta propia (rapidez, seguridad, transparencia).</li>
+                    <li>Cliente apurado: agente no destaca que la inspección es rápida (15-20 min) y sin compromiso.</li></div>
+  </div>
+</div>
+
+<!-- ── CAPA 2 ── -->
+<div id="c2" class="sec">
+  <div class="capa-header" style="background:#fffbeb;color:#92400e">
+    <div class="num">2</div>
+    <div class="info">
+      <h2>⚠️ Capa 2 — Cliente agenda cita pero NO compra</h2>
+      <p>Objetivo: identificar fricción comercial · Señales de riesgo detectables en la llamada</p>
+    </div>
+  </div>
+  
+    <div style="text-align:center;padding:60px 20px;background:#f8fafc;border-radius:12px;border:2px dashed #d9770640;margin:16px 0">
+      <div style="font-size:3rem;margin-bottom:12px">⏳</div>
+      <h3 style="color:#d97706;font-size:1.1rem;margin-bottom:8px">Capa 2 — Agendó, no compró — Sin datos cargados</h3>
+      <p style="color:#64748b;font-size:.85rem;max-width:480px;margin:0 auto 16px">
+        Para activar este análisis, coloca los MP3 correspondientes en la carpeta indicada y ejecuta el script.
+      </p>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 20px;display:inline-block;text-align:left;font-size:.82rem;color:#374151">
+        <div style="margin-bottom:6px"><strong>Carpeta:</strong> <code>LeadsCompra\llamadas_capa2\</code></div>
+        <div style="margin-bottom:6px"><strong>Excel de salida:</strong> <code>datos\Analisis_Capa2_No_Compro.xlsx</code></div>
+        <div><strong>Script:</strong> <code>python scripts\procesar_capa2.py</code></div>
+      </div>
+      <p style="color:#94a3b8;font-size:.78rem;margin-top:14px">
+        Después vuelve a correr <code>python scripts\generar_panel_comparativo.py</code>
+      </p>
+    </div>
+</div>
+
+<!-- ── CAPA 3 ── -->
+<div id="c3" class="sec">
+  <div class="capa-header" style="background:#eff6ff;color:#1e40af">
+    <div class="num">3</div>
+    <div class="info">
+      <h2>✅ Capa 3 — Compra exitosa (ABR-JUN 2025 hasta el 4 de junio)</h2>
+      <p>Casos de éxito · Base para el proceso de validación de alto interés · 100% con cita confirmada</p>
+    </div>
+  </div>
+  
+  <div class="kpi-row">
+    <div class="kpi" style="border-color:#2563eb">
+          <div class="num" style="color:#2563eb">159</div>
+          <div class="lbl">Conversiones<br>exitosas</div></div>
+    <div class="kpi" style="border-color:#22c55e">
+          <div class="num" style="color:#22c55e">51</div>
+          <div class="lbl">% Actitud<br>positiva</div></div>
+    <div class="kpi" style="border-color:#f59e0b">
+          <div class="num" style="color:#f59e0b">20</div>
+          <div class="lbl">% Preguntaron<br>precio</div></div>
+    <div class="kpi" style="border-color:#ef4444">
+          <div class="num" style="color:#ef4444">11</div>
+          <div class="lbl">% Fricción<br>con precio</div></div>
+    <div class="kpi" style="border-color:#8b5cf6">
+          <div class="num" style="color:#8b5cf6">10</div>
+          <div class="lbl">% Cotizaron<br>en otro lado</div></div>
+    <div class="kpi" style="border-color:#06b6d4">
+          <div class="num" style="color:#06b6d4">16</div>
+          <div class="lbl">% Con prenda<br>o crédito</div></div>
+  </div>
+  <div class="g3">
+    <div class="card"><h3>Actitud Inicial</h3><canvas id="ch_c3_act"></canvas></div>
+    <div class="card"><h3>Motivo de Venta</h3><canvas id="ch_c3_mot"></canvas></div>
+    <div class="card"><h3>Fricción en Precio</h3><canvas id="ch_c3_fr"></canvas></div>
+  </div>
+  <div class="g3">
+    <div class="card"><h3>¿Preguntó Precio?</h3><canvas id="ch_c3_pr"></canvas></div>
+    <div class="card"><h3>¿Ya Cotizó en Otro Lado?</h3><canvas id="ch_c3_co"></canvas></div>
+    <div class="card"><h3>Prenda / Financiera</h3><canvas id="ch_c3_pd"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Factores de Conversión — Análisis de Casos Exitosos</h3>
+    <div class="synthesis">```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Conversión - Ventas Autos Usados Chile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a3a52;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+        h4 {
+            color: #e74c3c;
+            margin-top: 25px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .metric {
+            background-color: #ecf0f1;
+            padding: 12px;
+            border-left: 4px solid #27ae60;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .metric strong {
+            color: #27ae60;
+            font-size: 18px;
+        }
+        ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .perfil-box {
+            background-color: #ecf7ff;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+            margin: 15px 0;
+        }
+        .señal-box {
+            background-color: #fff3cd;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #f39c12;
+            margin: 15px 0;
+        }
+        .factor-ranking {
+            display: flex;
+            align-items: center;
+            background-color: #fef5e7;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #e67e22;
+        }
+        .factor-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-right: 15px;
+            min-width: 40px;
+        }
+        .factor-content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 ANÁLISIS DE CONVERSIÓN - VENTAS AUTOS USADOS</h1>
+        <p><strong>Período:</strong> Abril - Junio 2025 | <strong>Llamadas exitosas:</strong> 159 (Cita + Compra confirmada)</p>
+
+        <!-- SÍNTESIS ACTUAL -->
+        <h4>📈 SÍNTESIS DE ACTITUDES DETECTADAS</h4>
+        <div class="metric">
+            <strong>51%</strong> Actitud Positiva | <strong>38%</strong> Neutral | <strong>10%</strong> Resistente
+        </div>
+
+        <!-- TOP 6 FACTORES -->
+        <h4>🎯 TOP 6 FACTORES DE CONVERSIÓN (Ordenado por Impacto)</h4>
+
+        <div class="factor-ranking">
+            <div class="factor-number">1️⃣</div>
+            <div class="factor-content">
+                <strong>Disponibilidad Inmediata del Cliente</strong><br>
+                <span style="color: #27ae60; font-weight: bold;">Impacto: 89% de conversión</span><br>
+                Clientes que aceptan cita <strong>hoy mismo</strong> o próximo día sin objeciones. Eliminan fricción temporal. Patrón: "confirma cita para próximas 24h sin negociar horario".
+            </div>
+        </div>
+
+        <div class="factor-ranking">
+            <div class="factor-number">2️⃣</div>
+            <div class="factor-content">
+                <strong>Bonificación de $300.000 CLP</strong><br>
+                <span style="color: #27ae60; font-weight: bold;">Impacto: 72% receptividad</span><br>
+                Incentivo por asistencia a inspección. <strong>25 de 159 clientes (16%)</strong> mencionan aprecio explícito. Refuerza motivación en clientes con urgencia moderada-alta de liquidez.
+            </div>
+        </div>
+
+        <div class="factor-ranking">
+            <div class="factor-number">3️⃣</div>
+            <div class="factor-content">
+                <strong>Actitud Colaborativa + Respuestas Afirmativas Completas</strong><br>
+                <span style="color: #27ae60; font-weight: bold;">Impacto: 85% de cierre</span><br>
+                Cliente responde SÍ sin objeciones a: documentación requerida (clase B vigente), estado legal (sin robo, sin prendas). Proporciona datos vehiculares (patente, km, año) de forma clara. <strong>Patrón clave:</strong> "acepta todas las validaciones sin cuestionamientos".
+            </div>
+        </div>
+
+        <div class="factor-ranking">
+            <div class="factor-number">4️⃣</div>
+            <div class="factor-content">
+                <strong>Claridad en Expectativas de Precio (sin fricción)</strong><br>
+                <span style="color: #27ae60; font-weight: bold;">Impacto: 68% conversión | Fricción: 11% (17/159)</span><br>
+                <strong>32 clientes (20%)</strong> preguntaron precio, pero solo <strong>17 (11%)</strong> presentaron fricción. Los que cierran: aceptan explicación sobre depreciación post-inspección sin negociar. Cotizaron previamente en internet ($10M promedio) y validan proceso.
+            </div>
+        </div>
+
+        <div class="factor-ranking">
+            <div class="factor-number">5️⃣</div>
+            <div class="factor-content">
+                <strong>Urgencia de Liquidez (Señal de motivación)</strong><br>
+                <span style="color: #27ae60; font-weight: bold;">Impacto: 81% conversión acelerada</span><br>
+                Clientes que</div>
+  </div>
+</div>
+
+<!-- ── COMPARACIÓN ── -->
+<div id="comp" class="sec">
+  
+  
+  <div class="card">
+    <h3>Síntesis Comparativa — ¿Qué diferencia a cada tipo de cliente?</h3>
+    <div class="synthesis">```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Análisis Comparativo - Llamadas de Compra Clicar.cl</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #1a73e8; border-bottom: 3px solid #1a73e8; padding-bottom: 10px; }
+        h4 { color: #d32f2f; margin-top: 25px; }
+        .metrica { background-color: #f0f7ff; padding: 12px; border-left: 4px solid #1a73e8; margin: 10px 0; }
+        ul { margin: 15px 0; padding-left: 25px; }
+        li { margin: 10px 0; line-height: 1.6; }
+        .protocolo { background-color: #fff3e0; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        .paso { background-color: white; padding: 12px; margin: 10px 0; border-left: 4px solid #f57c00; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 Análisis Comparativo: Capas de Llamadas Clicar.cl</h2>
+    
+    <h4>🔍 Diferencias Clave entre Capa 1 (Sin Agenda) y Capa 3 (Compradores)</h4>
+    
+    <ul>
+        <li>
+            <strong>1. Actitud Positiva - Brecha de 8 puntos porcentuales</strong>
+            <div class="metrica">
+                • Capa 1 (No agenda): 59% actitud positiva<br>
+                • Capa 3 (Compra): 51% actitud positiva<br>
+                <strong>Insight:</strong> Paradójicamente, quienes NO agendan muestran más optimismo inicial. Los compradores reales filtraban más rigurosamente desde el inicio, priorizando conveniencia sobre entusiasmo.
+            </div>
+        </li>
+        
+        <li>
+            <strong>2. Resistencia - Aumento de 2 puntos (8% vs 10%)</strong>
+            <div class="metrica">
+                • Capa 1: 8% resistente<br>
+                • Capa 3: 10% resistente<br>
+                <strong>Insight:</strong> Los compradores finales tenían objeciones manejables. La resistencia fue SUPERADA en el proceso de venta, indicando que el equipo de seguimiento fue efectivo con esta capa.
+            </div>
+        </li>
+        
+        <li>
+            <strong>3. Neutralidad - Diferencia crítica de 13 puntos</strong>
+            <div class="metrica">
+                • Capa 1: 25% neutral<br>
+                • Capa 3: 38% neutral<br>
+                <strong>Insight:</strong> Los compradores mostraban más cautela inicial (menos euforia, más evaluación). La neutralidad = análisis racional del producto. Este perfil es más CONVERTIBLE que el entusiasta que no actúa.
+            </div>
+        </li>
+        
+        <li>
+            <strong>4. Perfil Psicográfico del Comprador</strong>
+            <div class="metrica">
+                <strong>Capa 3 (Compradores):</strong> 51% positivos + 38% neutrales = 89% receptivos<br>
+                <strong>Capa 1 (Sin agenda):</strong> 59% positivos + 25% neutrales = 84% receptivos<br>
+                <strong>Insight:</strong> Aunque la receptividad es similar, la CALIDAD es diferente. Capa 3 = decisores. Capa 1 = soñadores. La ratio positivos:neutrales de Capa 3 (1.34:1) indica equilibrio entre entusiasmo y pragmatismo.
+            </div>
+        </li>
+    </ul>
+
+    <h2>⚡ Protocolo de Acción Rápida para Alto Interés</h2>
+    
+    <div class="protocolo">
+        <h4>Activación en 4 Pasos (máximo 72 horas)</h4>
+        
+        <div class="paso">
+            <strong>PASO 1: Identificación Inmediata (0-15 min)</strong><br>
+            Cuando detectes cliente con actitud neutral-positiva (38-51% range):<br>
+            • Pregunta clave: "¿Qué aspecto específico del auto te preocupa?"<br>
+            • Si responde con objeciones claras → ALTA probabilidad de compra<br>
+            • Documenta el concern en el CRM con etiqueta "DECISOR-ACTIVO"
+        </div>
+        
+        <div class="paso">
+            <strong>PASO 2: Validación de Necesidad (15-30 min)</strong><br>
+            Evita overselling. Prueba con preguntas de confirmación:<br>
+            • "¿Para cuándo necesitas el vehículo?"<br>
+            • "¿Ya visitaste el sitio o es primera vez?"<br>
+            • Si tiene timeline definido = potencial comprador (Capa 3)<br>
+            • Si vago/lejano = probablemente Capa 1
+        </div>
+        
+        <div class="paso">
+            <strong>PASO 3: Agendar + Incentivo Inmediato (30-45 min)</strong><br>
+            NO esperes seguimiento posterior:<br>
+            • Agenda test drive en próximas 48 horas<br>
+            • Ofrece descuento único por "agendar hoy" (ej: "Lleva garantía adicional si confirmas esta semana")<br>
+            • Envía confirmación por WhatsApp con foto del auto específico<br>
+            • Asigna ejecutivo de venta antes del cierre de llamada
+        </div>
+        
+        <div class="paso">
+            <strong>PASO 4: Follow-up Diferenciado (24-48 horas)</strong><br>
+            Según actitud detectada:<br>
+            • <strong>Neutrales (38%):</strong> Envía comparativa de autos + análisis de valor<br>
+            • <strong>Positivos (51%):</strong> Mensaje personal del ejecutivo + facilidades de financiamiento<br>
+            • <strong>Resistentes (10%):</strong</div>
+  </div>
+  <div class="g2">
+    <div class="card"><h3>Actitud Inicial por Capa</h3><canvas id="ch_act_comp"></canvas></div>
+    <div class="card"><h3>Pregunta de Precio por Capa</h3><canvas id="ch_precio_comp"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Fricción en Precio por Capa</h3>
+    <canvas id="ch_fr_comp" style="max-height:220px"></canvas>
+  </div>
+  <div class="insight" style="background:#f8fafc;border-color:#cbd5e1;margin-top:16px">
+    <h3 style="color:#475569">Marco de validación de alto interés</h3>
+    <p>
+      <strong>Protocolo de acción rápida</strong> — cuando el cliente muestra señales de alto interés en los primeros 60 segundos:<br><br>
+      <strong style="color:#dc2626">Capa 1</strong> previene: no perder al cliente por falta de manejo de objeciones.<br>
+      <strong style="color:#d97706">Capa 2</strong> previene: no perder la cita por brecha de precio o expectativa no gestionada.<br>
+      <strong style="color:#2563eb">Capa 3</strong> define: qué perfil y qué conducta predice el cierre, y hay que replicarla.
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function showTab(id,el){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+window.addEventListener('load',()=>{
+  new Chart(document.getElementById('ch_embudo'),{type:'bar',
+      data:{labels:["C1 \u2014 Atiende, no agenda (100)", "C2 \u2014 Sin datos", "C3 \u2014 Compra exitosa      (159)"],
+             datasets:[{data:[100, 0, 159],
+               backgroundColor:['#dc2626bb','#d97706bb','#2563ebbb'],
+               borderColor:['#dc2626','#d97706','#2563eb'],borderWidth:2}]},
+      options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},
+        title:{display:true,text:'Volumen por capa de conversión',font:{size:13,weight:'bold'}}},
+        scales:{x:{beginAtZero:true}}
+      }});new Chart(document.getElementById('ch_grupos_act'),{type:'bar',
+      data:{labels:["Capa 1 \u2014 No agend\u00f3", "Capa 3 \u2014 Compra exitosa"],datasets:[{label:'Positiva',data:[59, 51],
+            backgroundColor:'#22c55ebb',borderColor:'#22c55e',borderWidth:1},{label:'Neutral',data:[25, 38],
+            backgroundColor:'#f59e0bbb',borderColor:'#f59e0b',borderWidth:1},{label:'Resistente',data:[8, 10],
+            backgroundColor:'#ef4444bb',borderColor:'#ef4444',borderWidth:1}]},
+      options:{responsive:true,plugins:{legend:{position:'top'},
+        title:{display:true,text:'Grupos de Actitud por Capa (%)',font:{size:12,weight:'bold'}}},
+        scales:{x:{ticks:{font:{size:10}}},y:{beginAtZero:true,ticks:{stepSize:1}}}
+      }});new Chart(document.getElementById('ch_act_comp'),{type:'bar',
+      data:{labels:["Tranquilo", "Apurado", "Receptivo", "Inseguro", "Desconfiado", "No aplica", "Esceptico", "Molesto"],datasets:[{label:'Capa 1 — No agendó',data:[15, 9, 50, 10, 7, 1, 4, 1],
+            backgroundColor:'#dc2626bb',borderColor:'#dc2626',borderWidth:1},{label:'Capa 3 — Compra exitosa',data:[1, 8, 29, 19, 5, 0, 0, 0],
+            backgroundColor:'#2563ebbb',borderColor:'#2563eb',borderWidth:1}]},
+      options:{responsive:true,plugins:{legend:{position:'top'},
+        title:{display:true,text:'Actitud Inicial — Comparación entre Capas',font:{size:12,weight:'bold'}}},
+        scales:{x:{ticks:{font:{size:10}}},y:{beginAtZero:true,ticks:{stepSize:1}}}
+      }});new Chart(document.getElementById('ch_precio_comp'),{type:'bar',
+      data:{labels:["Pregunt\u00f3 precio", "No pregunt\u00f3 precio"],datasets:[{label:'Capa 1 — No agendó',data:[0, 0],
+            backgroundColor:'#dc2626bb',borderColor:'#dc2626',borderWidth:1},{label:'Capa 3 — Compra exitosa',data:[32, 127],
+            backgroundColor:'#2563ebbb',borderColor:'#2563eb',borderWidth:1}]},
+      options:{responsive:true,plugins:{legend:{position:'top'},
+        title:{display:true,text:'Pregunta de Precio — Comparación',font:{size:12,weight:'bold'}}},
+        scales:{x:{ticks:{font:{size:10}}},y:{beginAtZero:true,ticks:{stepSize:1}}}
+      }});new Chart(document.getElementById('ch_fr_comp'),{type:'bar',
+      data:{labels:["Acepta", "No le gusta", "N/A"],datasets:[{label:'Capa 1 — No agendó',data:[0, 0, 0],
+            backgroundColor:'#dc2626bb',borderColor:'#dc2626',borderWidth:1},{label:'Capa 3 — Compra exitosa',data:[11, 17, 0],
+            backgroundColor:'#2563ebbb',borderColor:'#2563eb',borderWidth:1}]},
+      options:{responsive:true,plugins:{legend:{position:'top'},
+        title:{display:true,text:'Fricción en Precio — Comparación',font:{size:12,weight:'bold'}}},
+        scales:{x:{ticks:{font:{size:10}}},y:{beginAtZero:true,ticks:{stepSize:1}}}
+      }});new Chart(document.getElementById('ch_c3_act'),{type:'bar',
+      data:{labels:["Receptivo", "Anal\u00edtico", "Decidido", "Inseguro", "Colaborativo", "Negociador", "Esc\u00e9ptico", "Apurado", "Desconfiado", "Apurada"],datasets:[{data:[29, 27, 27, 19, 15, 13, 11, 8, 5, 2],backgroundColor:'#2563ebcc',borderColor:'#2563eb',borderWidth:1}]},
+      options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},
+        title:{display:true,text:'Actitud Inicial',font:{size:12,weight:'bold'}}},
+        scales:{x:{beginAtZero:true,ticks:{stepSize:1}}}
+      }});new Chart(document.getElementById('ch_c3_mot'),{type:'doughnut',
+      data:{labels:["Sin urgencia", "Necesita liquidez", "Cambio de auto", "Urgencia alta"],datasets:[{data:[18, 10, 10, 6],backgroundColor:["#2563eb", "#22c55e", "#f59e0b", "#ef4444"],borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+        title:{display:true,text:'Motivo de Venta',font:{size:12,weight:'bold'}}}}
+      });new Chart(document.getElementById('ch_c3_pr'),{type:'doughnut',
+      data:{labels:["No", "S\u00ed"],datasets:[{data:[127, 32],backgroundColor:["#2563eb", "#22c55e"],borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+        title:{display:true,text:'Preguntó Precio',font:{size:12,weight:'bold'}}}}
+      });new Chart(document.getElementById('ch_c3_fr'),{type:'doughnut',
+      data:{labels:["No le gusta", "Acepta"],datasets:[{data:[17, 11],backgroundColor:["#2563eb", "#22c55e"],borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+        title:{display:true,text:'Fricción Precio',font:{size:12,weight:'bold'}}}}
+      });new Chart(document.getElementById('ch_c3_co'),{type:'doughnut',
+      data:{labels:["S\u00ed", "No"],datasets:[{data:[16, 1],backgroundColor:["#2563eb", "#22c55e"],borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+        title:{display:true,text:'Cotizó en Otro Lado',font:{size:12,weight:'bold'}}}}
+      });new Chart(document.getElementById('ch_c3_pd'),{type:'doughnut',
+      data:{labels:["No", "S\u00ed (Santander", "S\u00ed (Forum", "S\u00ed", "S\u00ed (Tanner", "S\u00ed (Crediautos", "S\u00ed (Falabella"],datasets:[{data:[126, 7, 7, 6, 3, 1, 1],backgroundColor:["#2563eb", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#f97316"],borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+        title:{display:true,text:'Prenda / Financiera',font:{size:12,weight:'bold'}}}}
+      });new Chart(document.getElementById('ch_c1_act'),{type:'bar',
+      data:{labels:["Receptivo", "Tranquilo", "Inseguro", "Apurado", "Desconfiado", "Esceptico", "No aplica", "Molesto", "Desinteresada"],datasets:[{data:[50, 15, 10, 9, 7, 4, 1, 1, 1],backgroundColor:'#dc2626cc',borderColor:'#dc2626',borderWidth:1}]},
+      options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},
+        title:{display:true,text:'Actitud Inicial',font:{size:12,weight:'bold'}}},
+        scales:{x:{beginAtZero:true,ticks:{stepSize:1}}}
+      }});new Chart(document.getElementById('ch_c1_ca'),{type:'doughnut',
+      data:{labels:["Deficiente", "Regular", "No aplica"],datasets:[{data:[93, 4, 1],backgroundColor:["#2563eb", "#22c55e", "#f59e0b"],borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+        title:{display:true,text:'Calidad Manejo Objeción',font:{size:12,weight:'bold'}}}}
+      });new Chart(document.getElementById('ch_c1_nv'),{type:'doughnut',
+      data:{labels:["Alto", "Medio", "Bajo", "No aplica", "Alto \u2014 cliente ten\u00eda barrera geogr\u00e1fica importante y requer\u00eda mucho convencimiento log\u00edstico", "Alto \u2014 el cliente ten\u00eda una objeci\u00f3n leg\u00edtima que requer\u00eda manejo profesional y reencuadre.", "Alto \u2014 Obst\u00e1culo externo (aprobaci\u00f3n jefe) que requer\u00eda estrategia alternativa para sortear."],datasets:[{data:[38, 18, 11, 2, 1, 1, 1],backgroundColor:["#2563eb", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#f97316"],borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+        title:{display:true,text:'Nivel de Negociación Requerido',font:{size:12,weight:'bold'}}}}
+      });new Chart(document.getElementById('ch_c1_ob'),{type:'bar',
+      data:{labels:["No hubo gesti\u00f3n de objeciones. El cliente inform\u00f3 que ya vendi\u00f3 el auto y el agente acept\u00f3 inmediatamente sin profundizar, verificar detalles o explorar si hab\u00eda otro veh\u00edculo de inter\u00e9s.", "El agente no gestion\u00f3 objeciones. Ante la respuesta negativa del cliente, acept\u00f3 inmediatamente sin indagar causas, preguntar razones de la falta de inter\u00e9s o intentar revertir la decisi\u00f3n con argumentos comerciales.", "El agente no gestion\u00f3 las objeciones. Ante la objeci\u00f3n del cliente ('no tengo mis manos'), simplemente acept\u00f3 sin indagar, repreguntar o buscar soluciones alternativas. No intent\u00f3 entender qu\u00e9 significaba exactamente la limitaci\u00f3n mencionada.", "El agente no gestion\u00f3 objeciones. Cuando el cliente comunic\u00f3 estar ocupado, el agente simplemente acept\u00f3 sin intentar identificar mejor momento, valor de la propuesta o beneficios inmediatos. No hubo reconocimiento de la objeci\u00f3n ni estrategia de manejo.", "El agente no gestion\u00f3 objeciones. El cliente declina inmediatamente sin expresar dudas o resistencias claras. El agente no indaga sobre el motivo real del rechazo, no profundiza en la situaci\u00f3n del veh\u00edculo ni intenta resolver ninguna objeci\u00f3n potencial.", "El agente intent\u00f3 resolver la objeci\u00f3n geogr\u00e1fica ofreciendo sucursales alternativas en la zona norte (La Serena, Coquimbo). Reconoci\u00f3 que no ten\u00eda cobertura cercana pero propuso malls con atenci\u00f3n s\u00e1bado/domingo en Santiago (Plaza Vespucio, Wechuraba). Sin embargo, no logr\u00f3 neutralizar la distancia como barrera real.", "El agente no gestion\u00f3 las objeciones. Cuando el cliente expres\u00f3 que ten\u00eda que llevar el auto \u00e9l mismo y que era 'temeritina', el agente no indag\u00f3 qu\u00e9 significa esa palabra, no profundiz\u00f3 en la barrera real del cliente, y pas\u00f3 directamente a preguntar disponibilidad sin resolver la objeci\u00f3n inicial.", "El agente no gestion\u00f3 objeciones de forma efectiva. Cuando el cliente mencion\u00f3 que ya estaba en una visita con Click Art Outos, Vicente no aprovech\u00f3 para confirmar la cita o aclarar el estado. Solo pregunt\u00f3 si ya hab\u00eda visitado, sin intentar posicionar su rol o agregar valor."],datasets:[{data:[1, 1, 1, 1, 1, 1, 1, 1],backgroundColor:'#dc2626cc',borderColor:'#dc2626',borderWidth:1}]},
+      options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},
+        title:{display:true,text:'Objeción Principal',font:{size:12,weight:'bold'}}},
+        scales:{x:{beginAtZero:true,ticks:{stepSize:1}}}
+      }});
+});
+</script>
+</body></html>

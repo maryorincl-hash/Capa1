@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>El Agente de Compra | Americar 2025</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -65,6 +66,42 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .s-navy2{background:var(--navy2)}.s-blue{background:linear-gradient(135deg,#071e2e,#0f3347)}.s-navy{background:var(--navy)}
 @keyframes ring-shake{0%,100%{transform:rotate(0deg)}15%{transform:rotate(-6deg)}30%{transform:rotate(6deg)}45%{transform:rotate(-4deg)}60%{transform:rotate(4deg)}75%{transform:rotate(-2deg)}90%{transform:rotate(2deg)}}
 .phone-ring{animation:ring-shake 1.6s ease-in-out infinite;transform-origin:center;display:inline-block}
+/* ── Cheat sheet modal ── */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#modal-overlay.open{display:flex}
+#modal-box{position:relative;max-height:95vh;overflow-y:auto;border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+#modal-close{position:sticky;top:10px;float:right;margin:8px 8px 0 0;background:#e63946;border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:900;line-height:30px;text-align:center;z-index:10}
+/* ── Card para descargar ── */
+#cheatcard{width:530px;background:#fff;color:#111;font-family:'Segoe UI',system-ui,sans-serif;padding:0;border-radius:10px;overflow:hidden}
+.cc-header{background:#0c2838;color:#fff;padding:16px 22px 14px;display:flex;align-items:center;justify-content:space-between}
+.cc-brand{font-size:18px;font-weight:900;letter-spacing:-0.5px;color:#3dd9a0}
+.cc-sub{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:2px}
+.cc-title{text-align:right}
+.cc-title p{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#3dd9a0}
+.cc-title h2{font-size:15px;font-weight:900;color:#fff;line-height:1.1}
+.cc-body{padding:14px 20px 10px}
+.cc-step{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;margin-bottom:7px;border-left:4px solid transparent}
+.cc-step-a{background:#f0fdf4;border-color:#16a34a}
+.cc-step-b{background:#eff6ff;border-color:#2563eb}
+.cc-step-c{background:#faf5ff;border-color:#7c3aed}
+.cc-step-ok{background:#ecfdf5;border-color:#059669}
+.cc-num{min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;color:#fff}
+.cc-num-a{background:#16a34a}
+.cc-num-b{background:#2563eb}
+.cc-num-c{background:#7c3aed}
+.cc-num-ok{background:#059669}
+.cc-txt h4{font-size:12px;font-weight:800;color:#111;margin-bottom:2px;line-height:1.2}
+.cc-txt p{font-size:10.5px;color:#444;line-height:1.45}
+.cc-txt p em{font-style:normal;color:#0c2838;font-weight:700}
+.cc-cta{margin:10px 20px 14px;background:#0c2838;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.cc-cta .icon{font-size:22px}
+.cc-cta .txt p{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#3dd9a0;margin-bottom:2px}
+.cc-cta .txt h3{font-size:14px;font-weight:900;color:#fff}
+.cc-footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:7px 20px;display:flex;justify-content:space-between;align-items:center}
+.cc-footer span{font-size:9px;color:#94a3b8;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+/* ── Botón descarga ── */
+.btn-dl{display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:var(--navy);padding:10px 22px;border-radius:50px;font-size:13px;font-weight:800;border:none;cursor:pointer;transition:all .2s;margin-top:12px}
+.btn-dl:hover{background:var(--green);transform:translateY(-1px)}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   @page{size:1366px 768px;margin:0}
@@ -361,37 +398,37 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <div>
       <div class="step" style="border-left-color:#86efac">
         <div class="step-n" style="background:#86efac;color:#0c2838;font-size:10px">A1</div>
-        <div class="step-t"><strong>Conectar con el auto específico</strong><br><span style="font-size:11px;color:var(--gray)">"Hola [Nombre], soy [Agente] de Americar. Vi que tasaste tu <em style="color:var(--teal);font-style:normal">[Marca Modelo Año]</em> — te llamo para contarte cómo funciona el proceso de compra. ¿Tienes 2 minutos?"</span></div>
+        <div class="step-t"><strong>📞 Conectar con el auto específico</strong><br><span style="font-size:11px;color:var(--gray)">"Hola [Nombre], soy [Agente] de Americar. Vi que tasaste tu <em style="color:var(--teal);font-style:normal">[Marca Modelo Año]</em> — te llamo para contarte cómo funciona el proceso de compra. ¿Tienes 2 minutos?"</span></div>
       </div>
       <div class="step" style="border-left-color:#86efac">
         <div class="step-n" style="background:#86efac;color:#0c2838;font-size:10px">A2</div>
-        <div class="step-t"><strong>Tono asesor, no de cobranza</strong><br><span style="font-size:11px;color:var(--gray)">Habla con energía moderada. Sonríe — se escucha. No leas el guión — conócelo.</span></div>
+        <div class="step-t"><strong>😊 Tono asesor, no de cobranza</strong><br><span style="font-size:11px;color:var(--gray)">Habla con energía moderada. Sonríe — se escucha. No leas el guión — conócelo.</span></div>
       </div>
       <div class="step" style="border-left-color:#93c5fd">
         <div class="step-n" style="background:#93c5fd;color:#0c2838;font-size:10px">B1</div>
-        <div class="step-t"><strong>Preguntar motivación</strong><br><span style="font-size:11px;color:var(--gray)">"¿Qué te motivó a tasar el auto?" — escucha la respuesta completa, no interrumpas.</span></div>
+        <div class="step-t"><strong>💬 Preguntar motivación</strong><br><span style="font-size:11px;color:var(--gray)">"¿Qué te motivó a tasar el auto?" — escucha la respuesta completa, no interrumpas.</span></div>
       </div>
       <div class="step" style="border-left-color:#93c5fd">
         <div class="step-n" style="background:#93c5fd;color:#0c2838;font-size:10px">B2</div>
-        <div class="step-t"><strong>Detectar urgencia y titularidad</strong><br><span style="font-size:11px;color:var(--gray)">"¿Para cuándo lo estás pensando?" · "¿El auto está a tu nombre?"</span></div>
+        <div class="step-t"><strong>⏰ Detectar urgencia y titularidad</strong><br><span style="font-size:11px;color:var(--gray)">"¿Para cuándo lo estás pensando?" · "¿El auto está a tu nombre?"</span></div>
       </div>
     </div>
     <div>
       <div class="step" style="border-left-color:#c4b5fd">
         <div class="step-n" style="background:#c4b5fd;color:#0c2838;font-size:10px">C1</div>
-        <div class="step-t"><strong>Vender la inspección como beneficio</strong><br><span style="font-size:11px;color:var(--gray)">"La revisión dura 20 min, sin costo ni compromiso — es el paso para confirmar o mejorar tu precio. ¿Te acomoda el [día/hora]?"</span></div>
+        <div class="step-t"><strong>🗓️ Vender la inspección como beneficio</strong><br><span style="font-size:11px;color:var(--gray)">"La revisión dura 20 min, sin costo ni compromiso — es el paso para confirmar o mejorar tu precio. ¿Te acomoda el [día/hora]?"</span></div>
       </div>
       <div class="step" style="border-left-color:#c4b5fd">
         <div class="step-n" style="background:#c4b5fd;color:#0c2838;font-size:10px">C2</div>
-        <div class="step-t"><strong>Primer "no" → no rendirse</strong><br><span style="font-size:11px;color:var(--gray)">"Entiendo. ¿Qué día te acomodaría mejor? También tenemos sucursal en [alternativa] si la distancia es el tema."</span></div>
+        <div class="step-t"><strong>🔄 Primer "no" → no rendirse</strong><br><span style="font-size:11px;color:var(--gray)">"Entiendo. ¿Qué día te acomodaría mejor? También tenemos sucursal en [alternativa] si la distancia es el tema."</span></div>
       </div>
       <div class="step" style="border-left-color:#c4b5fd">
         <div class="step-n" style="background:#c4b5fd;color:#0c2838;font-size:10px">C3</div>
-        <div class="step-t"><strong>Segundo cierre con gancho si aplica</strong><br><span style="font-size:11px;color:var(--gray)">Si hay urgencia: "Tenemos una oferta de primer momento disponible esta semana — ¿agendamos hoy?"</span></div>
+        <div class="step-t"><strong>🎁 Segundo cierre con gancho si aplica</strong><br><span style="font-size:11px;color:var(--gray)">Si hay urgencia: "Tenemos una oferta de primer momento disponible esta semana — ¿agendamos hoy?"</span></div>
       </div>
       <div class="step" style="border-left-color:var(--orange)">
         <div class="step-n" style="background:var(--orange);font-size:10px">✓</div>
-        <div class="step-t"><strong>Confirmar y cerrar con datos</strong><br><span style="font-size:11px;color:var(--gray)">Confirma día, hora, sucursal y dirección. Repite el nombre del cliente al cerrar.</span></div>
+        <div class="step-t"><strong>✅ Confirmar y cerrar con datos</strong><br><span style="font-size:11px;color:var(--gray)">Confirma día, hora, sucursal y dirección. Repite el nombre del cliente al cerrar.</span></div>
       </div>
     </div>
   </div>
@@ -403,27 +440,27 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   <h2 class="h1" style="margin-bottom:12px">Las <span style="color:var(--accent)">5 objeciones</span> reales y <span class="g">cómo responderlas</span></h2>
   <div style="display:flex;flex-direction:column;gap:7px">
     <div class="obj-row">
-      <div class="obj-objecion">"Por ahora no, estoy muy ocupado/a"</div>
+      <div class="obj-objecion">⏱️ "Por ahora no, estoy muy ocupado/a"</div>
       <div class="obj-arrow">→</div>
       <div class="obj-respuesta">"Perfecto, <strong style="color:var(--teal)">justamente por eso</strong> — son solo 20 minutos, lo coordinas cuando tú lo decides. ¿Qué día te acomoda más esta semana o la próxima?"</div>
     </div>
     <div class="obj-row">
-      <div class="obj-objecion">"El precio me pareció muy bajo"</div>
+      <div class="obj-objecion">💸 "El precio me pareció muy bajo"</div>
       <div class="obj-arrow">→</div>
       <div class="obj-respuesta">"El precio web es un estimado base. La inspección presencial <strong style="color:var(--teal)">puede ajustarlo según el estado real</strong> de tu auto — ha pasado que el precio final es más alto. ¿Lo revisamos?"</div>
     </div>
     <div class="obj-row">
-      <div class="obj-objecion">"La sucursal me queda lejos"</div>
+      <div class="obj-objecion">📍 "La sucursal me queda lejos"</div>
       <div class="obj-arrow">→</div>
       <div class="obj-respuesta">"Entiendo. Tenemos sucursal también en <strong style="color:var(--teal)">[alternativa]</strong>. Y cubrimos el Uber de vuelta cuando concluye la venta — no tienes que preocuparte del regreso."</div>
     </div>
     <div class="obj-row">
-      <div class="obj-objecion">"Todavía no lo he decidido / lo tengo que pensar"</div>
+      <div class="obj-objecion">🤔 "Todavía no lo he decidido / lo tengo que pensar"</div>
       <div class="obj-arrow">→</div>
       <div class="obj-respuesta">"Claro, sin problema. La inspección <strong style="color:var(--teal)">no te compromete a vender</strong> — solo te da el precio oficial para que tomes la decisión con información real. ¿Qué te parece el [día]?"</div>
     </div>
     <div class="obj-row">
-      <div class="obj-objecion">"Ya lo vendí / ya fui a otro lado"</div>
+      <div class="obj-objecion">🚪 "Ya lo vendí / ya fui a otro lado"</div>
       <div class="obj-arrow">→</div>
       <div class="obj-respuesta">"Perfecto, me alegra que lo hayas resuelto. Si en el futuro tienes otro vehículo, <strong style="color:var(--teal)">cuéntame</strong> — Americar compra en promedio en 1 hora. Que te vaya bien."</div>
     </div>
@@ -525,8 +562,138 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   </div>
 </div>
 
-<!-- ══ SLIDE 13: CIERRE / CALL TO ACTION ══════════════════════════════════ -->
-<div class="slide s-cover" id="s13" style="justify-content:center;text-align:left">
+<!-- ══ SLIDE 13: PROTOCOLO MÍNIMO DESCARGABLE ═════════════════════════════ -->
+<div class="slide s-navy2" id="s13" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Protocolo mínimo · Descargable</div>
+  <h2 class="h1" style="margin-bottom:10px">Tu tarjeta de <span class="t">escritorio</span> —<br><span style="color:var(--light);font-size:.75em;font-weight:400">7 pasos que no pueden faltar en ninguna llamada</span></h2>
+  <div class="cols2" style="gap:20px;align-items:flex-start">
+    <div>
+      <p style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px">Vista previa de la tarjeta</p>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(21,128,61,.08);border:1.5px solid rgba(21,128,61,.3);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.3rem;flex-shrink:0">📞</span>
+          <div><strong style="font-size:12px;color:#86efac">1. Abre con el auto</strong><br><span style="font-size:11px;color:var(--light)">"Hola [Nombre], vi que tasaste tu [Marca Modelo Año]..."</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(21,128,61,.08);border:1.5px solid rgba(21,128,61,.3);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.3rem;flex-shrink:0">😊</span>
+          <div><strong style="font-size:12px;color:#86efac">2. Tono asesor</strong><br><span style="font-size:11px;color:var(--light)">Sonríe — se escucha. Energía moderada, no de cobranza.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(29,78,216,.08);border:1.5px solid rgba(29,78,216,.3);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.3rem;flex-shrink:0">💬</span>
+          <div><strong style="font-size:12px;color:#93c5fd">3. Pregunta motivación</strong><br><span style="font-size:11px;color:var(--light)">"¿Qué te motivó a tasar el auto?"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(29,78,216,.08);border:1.5px solid rgba(29,78,216,.3);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.3rem;flex-shrink:0">⏰</span>
+          <div><strong style="font-size:12px;color:#93c5fd">4. Detecta urgencia</strong><br><span style="font-size:11px;color:var(--light)">"¿Para cuándo lo estás pensando?" · "¿Eres el titular?"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(124,58,237,.08);border:1.5px solid rgba(124,58,237,.3);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.3rem;flex-shrink:0">🗓️</span>
+          <div><strong style="font-size:12px;color:#c4b5fd">5. Vende la cita</strong><br><span style="font-size:11px;color:var(--light)">"20 min, sin costo ni compromiso — confirma o mejora tu precio"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(124,58,237,.08);border:1.5px solid rgba(124,58,237,.3);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.3rem;flex-shrink:0">🔄</span>
+          <div><strong style="font-size:12px;color:#c4b5fd">6. Al primer "no": no te rindas</strong><br><span style="font-size:11px;color:var(--light)">Rebate con día alternativo o sucursal alternativa.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(5,150,105,.08);border:1.5px solid rgba(5,150,105,.4);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.3rem;flex-shrink:0">✅</span>
+          <div><strong style="font-size:12px;color:#6ee7b7">7. Confirma y cierra</strong><br><span style="font-size:11px;color:var(--light)">Día · Hora · Sucursal · Dirección · repite su nombre</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:20px">
+      <div style="font-size:4rem">🖨️</div>
+      <h3 style="font-size:18px;font-weight:800;color:#fff;line-height:1.2">Descarga la tarjeta<br>para tu escritorio</h3>
+      <p style="font-size:13px;color:var(--light);line-height:1.5;max-width:280px">Formato <strong style="color:#fff">media carta · fondo blanco</strong> — imprime, recorta y tenla al lado del teléfono.</p>
+      <button class="btn-dl" onclick="descargarTarjeta()">⬇ Descargar tarjeta (PNG)</button>
+      <p style="font-size:10px;color:var(--gray)">También puedes imprimir directamente desde el navegador</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CHEAT SHEET DESCARGABLE ════════════════════════════════════ -->
+<div id="modal-overlay" onclick="cerrarModal(event)">
+  <div id="modal-box">
+    <button id="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+    <!-- ── TARJETA MEDIA CARTA (blanca) ── -->
+    <div id="cheatcard">
+      <div class="cc-header">
+        <div>
+          <div class="cc-brand">AMERICAR</div>
+          <div class="cc-sub">Compra de Autos · Contact Center</div>
+        </div>
+        <div class="cc-title">
+          <p>Protocolo Mínimo</p>
+          <h2>Llamada<br>de Compra</h2>
+        </div>
+      </div>
+      <div class="cc-body">
+        <div class="cc-step cc-step-a">
+          <div class="cc-num cc-num-a">1</div>
+          <div class="cc-txt">
+            <h4>📞 Abre con el auto específico</h4>
+            <p>"Hola <em>[Nombre]</em>, soy <em>[Agente]</em> de Americar. Vi que tasaste tu <em>[Marca · Modelo · Año]</em> — te llamo para contarte cómo funciona el proceso. ¿Tienes 2 minutos?"</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-a">
+          <div class="cc-num cc-num-a">2</div>
+          <div class="cc-txt">
+            <h4>😊 Tono asesor — no de cobranza</h4>
+            <p>Sonríe al hablar — <em>se escucha</em>. Energía moderada. No leas el guión: conócelo.</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-b">
+          <div class="cc-num cc-num-b">3</div>
+          <div class="cc-txt">
+            <h4>💬 Pregunta la motivación</h4>
+            <p>"¿Qué te motivó a tasar el auto?" — <em>escucha la respuesta completa</em>, no interrumpas.</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-b">
+          <div class="cc-num cc-num-b">4</div>
+          <div class="cc-txt">
+            <h4>⏰ Detecta urgencia y titularidad</h4>
+            <p>"¿Para cuándo lo estás pensando?" &nbsp;·&nbsp; "<em>¿El auto está a tu nombre?</em>"</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-c">
+          <div class="cc-num cc-num-c">5</div>
+          <div class="cc-txt">
+            <h4>🗓️ Vende la cita como beneficio</h4>
+            <p>"Son <em>20 minutos</em>, sin costo ni compromiso — es el paso para confirmar o <em>mejorar tu precio</em>. ¿Te acomoda el <em>[día/hora]</em>?"</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-c">
+          <div class="cc-num cc-num-c">6</div>
+          <div class="cc-txt">
+            <h4>🔄 Al primer "no": no te rindas</h4>
+            <p>"Entiendo — ¿qué día te acomoda mejor?" · "También tenemos sucursal en <em>[alternativa]</em>." Intenta <em>al menos dos veces</em>.</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-ok">
+          <div class="cc-num cc-num-ok">7</div>
+          <div class="cc-txt">
+            <h4>✅ Confirma y cierra</h4>
+            <p>Confirma <em>día · hora · sucursal · dirección</em>. Repite el nombre del cliente al despedirte.</p>
+          </div>
+        </div>
+      </div>
+      <div class="cc-cta">
+        <div class="icon">🎯</div>
+        <div class="txt">
+          <p>Tu único objetivo en cada llamada</p>
+          <h3>Una cita de inspección agendada</h3>
+        </div>
+      </div>
+      <div class="cc-footer">
+        <span>Americar · Contact Center Compra 2025</span>
+        <span>Basado en 97 llamadas analizadas · clicar.cl</span>
+      </div>
+    </div><!-- /cheatcard -->
+  </div>
+</div>
+
+<!-- ══ SLIDE 14: CIERRE / CALL TO ACTION ══════════════════════════════════ -->
+<div class="slide s-cover" id="s14" style="justify-content:center;text-align:left">
   <div style="position:absolute;right:0;top:0;bottom:0;width:38%;background:linear-gradient(90deg,transparent,rgba(61,217,160,.05));pointer-events:none"></div>
   <div class="tag">Tu misión en cada llamada</div>
   <h1 style="font-size:clamp(28px,4vw,54px);font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:18px">
@@ -563,7 +730,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 
 <div id="nav">
   <button onclick="move(-1)">← Anterior</button>
-  <span id="ctr">1 / 13</span>
+  <span id="ctr">1 / 14</span>
   <button onclick="move(1)">Siguiente →</button>
 </div>
 
@@ -584,6 +751,31 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   move(-1);
 });
 show(0);
+
+function descargarTarjeta() {
+  const overlay = document.getElementById('modal-overlay');
+  const card = document.getElementById('cheatcard');
+  overlay.classList.add('open');
+  setTimeout(() => {
+    html2canvas(card, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      width: card.offsetWidth,
+      height: card.offsetHeight
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'Protocolo_Minimo_Llamada_Americar.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  }, 200);
+}
+function cerrarModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
 </script>
 </body>
 </html>

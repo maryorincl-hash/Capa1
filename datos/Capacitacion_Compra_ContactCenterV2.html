@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Agente que Convierte V2 | Americar 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0c2838;--navy2:#0f3347;--blue:#0a2233;
+  --accent:#e63946;--orange:#f5a623;--teal:#3dd9a0;
+  --green:#6ee7b7;--gray:#7a9aaa;--light:#c0d8e4;
+  --am-blue:#0c2838;--am-cyan:#3dd9a0
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--navy);color:#fff;overflow:hidden;height:100vh;width:100vw;-webkit-font-smoothing:antialiased}
+#progress{position:fixed;top:0;left:0;height:4px;background:var(--accent);transition:width .4s ease;z-index:100}
+.slide{position:absolute;inset:0;display:none;padding:3vh 6vw 88px;flex-direction:column;justify-content:center;overflow:hidden}
+.slide.active{display:flex}
+#nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:16px;z-index:100;background:rgba(12,40,56,0.88);padding:6px 18px;border-radius:50px;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1)}
+#nav button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;padding:8px 20px;border-radius:50px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+#nav button:hover{background:var(--am-cyan);color:var(--navy)}
+#ctr{font-size:13px;font-weight:600;color:var(--light);min-width:60px;text-align:center}
+.tag{display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:4px;margin-bottom:14px;width:fit-content}
+.h1{font-size:clamp(22px,3vw,46px);font-weight:800;line-height:1.15;letter-spacing:-1px;margin-bottom:14px}
+.h1 span{color:var(--accent)}.h1 .g{color:var(--green)}.h1 .o{color:var(--orange)}.h1 .t{color:var(--teal)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;height:100%}
+.ca{border-color:var(--accent);background:rgba(230,57,70,.06)}
+.co{border-color:var(--orange);background:rgba(245,166,35,.06)}
+.ct{border-color:var(--teal);background:rgba(61,217,160,.06)}
+.cg{border-color:var(--green);background:rgba(110,231,183,.06)}
+.card h3{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.card p,.card li{font-size:13px;line-height:1.6;color:var(--light)}
+.card ul{list-style:none}.card ul li::before{content:"→ ";color:var(--accent);font-weight:700}
+.stat{font-size:clamp(42px,6vw,78px);font-weight:900;line-height:1;letter-spacing:-3px}
+.stat-lbl{font-size:13px;color:var(--gray);margin-top:4px;line-height:1.3}
+.step{display:flex;align-items:flex-start;gap:12px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:10px;border-left:3px solid transparent;margin-bottom:6px}
+.step-n{min-width:26px;height:26px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0}
+.step-t{font-size:13px;color:var(--light);line-height:1.4}.step-t strong{color:#fff}
+.scr{background:rgba(61,217,160,.06);border:1px solid rgba(61,217,160,.2);border-radius:14px;padding:14px 18px;font-size:13px;line-height:1.7;color:var(--light)}
+.scr strong{color:var(--teal)}.scr em{color:var(--orange);font-style:normal;font-weight:600}
+.scr-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:6px;display:block}
+.bad{background:rgba(230,57,70,.07);border:1.5px dashed rgba(230,57,70,.4);border-radius:12px;padding:12px 14px}
+.good{background:rgba(110,231,183,.07);border:1.5px solid var(--green);border-radius:12px;padding:12px 14px}
+.lbl-bad{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:7px}
+.lbl-good{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:7px}
+.li-bad{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--light);margin-bottom:4px}
+.li-good{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--light);margin-bottom:4px}
+.kpi-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.kpi{background:rgba(255,255,255,.05);border-radius:10px;padding:12px 16px;text-align:center;flex:1;min-width:100px;border-top:3px solid transparent}
+.kpi .num{font-size:1.7rem;font-weight:800}.kpi .lbl{font-size:.68rem;color:var(--gray);margin-top:2px;line-height:1.3}
+.obj-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.obj-objecion{background:rgba(230,57,70,.08);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--light);font-style:italic}
+.obj-arrow{font-size:18px;color:var(--green);font-weight:900;text-align:center}
+.obj-respuesta{background:rgba(61,217,160,.07);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--light)}
+.gancho{border-radius:12px;padding:14px;text-align:center}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.badge{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:5px 14px;font-size:11px;font-weight:600;color:#ddd}
+.pilar-num{font-size:3.5rem;font-weight:900;opacity:.12;line-height:1;margin-bottom:-8px}
+.quote-box{background:rgba(12,34,51,1);border-radius:16px;padding:20px;text-align:center;border:1px solid rgba(61,217,160,.2)}
+.quote-box blockquote{font-size:clamp(14px,1.7vw,20px);font-weight:700;line-height:1.4;color:#fff;margin-bottom:6px}
+.quote-box cite{font-size:10px;color:var(--gray)}
+.s-cover{background:linear-gradient(135deg,#071e2e 0%,#0c2838 50%,#082031 100%)}
+.s-navy2{background:var(--navy2)}.s-blue{background:linear-gradient(135deg,#071e2e,#0f3347)}.s-navy{background:var(--navy)}
+@keyframes ring-shake{0%,100%{transform:rotate(0deg)}15%{transform:rotate(-6deg)}30%{transform:rotate(6deg)}45%{transform:rotate(-4deg)}60%{transform:rotate(4deg)}75%{transform:rotate(-2deg)}90%{transform:rotate(2deg)}}
+.phone-ring{animation:ring-shake 1.6s ease-in-out infinite;transform-origin:center;display:inline-block}
+/* ── Cheat sheet modal ── */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#modal-overlay.open{display:flex}
+#modal-box{position:relative;max-height:95vh;overflow-y:auto;border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+#modal-close{position:sticky;top:10px;float:right;margin:8px 8px 0 0;background:#e63946;border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:900;line-height:30px;text-align:center;z-index:10}
+/* ── Card para descargar ── */
+#cheatcard{width:530px;background:#fff;color:#111;font-family:'Segoe UI',system-ui,sans-serif;padding:0;border-radius:10px;overflow:hidden}
+.cc-header{background:#0c2838;color:#fff;padding:16px 22px 14px;display:flex;align-items:center;justify-content:space-between}
+.cc-brand{font-size:18px;font-weight:900;letter-spacing:-0.5px;color:#3dd9a0}
+.cc-sub{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:2px}
+.cc-title{text-align:right}
+.cc-title p{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#3dd9a0}
+.cc-title h2{font-size:15px;font-weight:900;color:#fff;line-height:1.1}
+.cc-body{padding:14px 20px 10px}
+.cc-step{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;margin-bottom:7px;border-left:4px solid transparent}
+.cc-step-a{background:#f0fdf4;border-color:#16a34a}
+.cc-step-b{background:#eff6ff;border-color:#2563eb}
+.cc-step-c{background:#faf5ff;border-color:#7c3aed}
+.cc-step-ok{background:#ecfdf5;border-color:#059669}
+.cc-num{min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;color:#fff}
+.cc-num-a{background:#16a34a}
+.cc-num-b{background:#2563eb}
+.cc-num-c{background:#7c3aed}
+.cc-num-ok{background:#059669}
+.cc-txt h4{font-size:12px;font-weight:800;color:#111;margin-bottom:2px;line-height:1.2}
+.cc-txt p{font-size:10.5px;color:#444;line-height:1.45}
+.cc-txt p em{font-style:normal;color:#0c2838;font-weight:700}
+.cc-cta{margin:10px 20px 14px;background:#0c2838;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.cc-cta .icon{font-size:22px}
+.cc-cta .txt p{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#3dd9a0;margin-bottom:2px}
+.cc-cta .txt h3{font-size:14px;font-weight:900;color:#fff}
+.cc-footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:7px 20px;display:flex;justify-content:space-between;align-items:center}
+.cc-footer span{font-size:9px;color:#94a3b8;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+/* ── Botón descarga ── */
+.btn-dl{display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:var(--navy);padding:10px 22px;border-radius:50px;font-size:13px;font-weight:800;border:none;cursor:pointer;transition:all .2s;margin-top:12px}
+.btn-dl:hover{background:var(--green);transform:translateY(-1px)}
+/* ── Accordion ── */
+.acc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.acc-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .2s,background .2s}
+.acc-card.open{border-color:var(--teal);background:rgba(61,217,160,.07)}
+.acc-trigger{padding:10px 12px;display:flex;align-items:flex-start;gap:9px;user-select:none}
+.acc-trigger .icon{font-size:1.3rem;flex-shrink:0;margin-top:1px}
+.acc-trigger .lbl{flex:1}.acc-trigger .lbl strong{font-size:12px;color:#fff;display:block;line-height:1.3}
+.acc-trigger .lbl small{font-size:10.5px;color:var(--gray);font-style:italic;margin-top:2px;display:block}
+.acc-trigger .arr{color:var(--teal);font-size:12px;margin-left:6px;margin-top:2px;flex-shrink:0;transition:transform .2s}
+.acc-card.open .arr{transform:rotate(90deg)}
+.acc-content{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.acc-card.open .acc-content{max-height:400px}
+.acc-inner{padding:0 12px 10px;font-size:11.5px;color:var(--light);line-height:1.55;border-top:1px solid rgba(255,255,255,.06);padding-top:8px}
+.acc-inner strong{color:var(--teal)}
+.flt-step{border-radius:10px;padding:10px 14px;margin-bottom:7px;border-left:4px solid transparent}
+/* ── Table ── */
+.fin-table{width:100%;border-collapse:collapse;font-size:11px}
+.fin-table th{background:rgba(61,217,160,.15);color:var(--teal);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:1px solid rgba(61,217,160,.2)}
+.fin-table td{padding:6px 10px;color:var(--light);border-bottom:1px solid rgba(255,255,255,.05)}
+.fin-table tr:nth-child(even) td{background:rgba(255,255,255,.03)}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  @page{size:1366px 768px;margin:0}
+  body{overflow:visible!important;height:auto!important;width:1366px!important}
+  #presentation{position:static!important;height:auto!important;overflow:visible!important;width:1366px!important}
+  .slide{position:relative!important;display:flex!important;height:768px!important;width:1366px!important;page-break-after:always!important;break-after:page!important;overflow:hidden!important}
+  .slide:last-child{page-break-after:avoid!important}
+  #nav,#progress{display:none!important}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="presentation">
+
+<!-- ══ SLIDE 1: PORTADA ══════════════════════════════════════════════════ -->
+<div class="slide s-cover active" id="s1">
+  <div style="position:absolute;right:0;top:0;bottom:0;width:38%;background:linear-gradient(90deg,transparent,rgba(61,217,160,.04));pointer-events:none"></div>
+  <p style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--am-cyan);margin-bottom:10px">Americar · Contact Center Compra 2026</p>
+  <h1 style="font-size:clamp(36px,6vw,72px);font-weight:900;line-height:1.05;letter-spacing:-2px;margin-bottom:14px">EL AGENTE<br><span style="color:var(--am-cyan)">QUE CONVIERTE V2</span></h1>
+  <p style="font-size:clamp(13px,1.4vw,17px);color:var(--light);max-width:600px;line-height:1.5;margin-bottom:10px">Guía avanzada: filtros, objeciones y casos especiales · JUN 2026</p>
+  <p style="font-size:11px;color:var(--am-cyan);letter-spacing:2px;font-weight:700">Compra de Autos Usados &nbsp;|&nbsp; Clicar.cl &nbsp;|&nbsp; JUN 2026</p>
+  <div class="badge-row" style="margin-top:18px">
+    <span class="badge">97 llamadas sin agenda analizadas</span>
+    <span class="badge">159 llamadas exitosas de referencia</span>
+    <span class="badge">Framework 3 Pilares</span>
+    <span class="badge" style="background:rgba(61,217,160,.12);border-color:var(--teal);color:var(--teal)">Script Clicar + Mapa de Objeciones Interactivo</span>
+  </div>
+</div>
+
+<!-- ══ SLIDE 2: ÍNDICE ════════════════════════════════════════════════════ -->
+<div class="slide s-navy" id="s2" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Contenido de la sesión</div>
+  <h2 class="h1" style="margin-bottom:12px">Índice: <span class="g">El Agente que Convierte V2</span></h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px">
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 15px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">01 · El contexto</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--teal);font-weight:700;flex-shrink:0">→</span>¿Quién es este cliente y por qué llamó?</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--teal);font-weight:700;flex-shrink:0">→</span>Lo que dicen los datos reales: el 62% falló por ejecución</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--teal);font-weight:700;flex-shrink:0">→</span>Tu ventaja: el contacto en 23 min ya funciona</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 15px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:8px">02 · Los 3 Pilares</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--orange);font-weight:700;flex-shrink:0">→</span><strong style="color:#fff">A:</strong> Apertura que conecta, no genérica</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--orange);font-weight:700;flex-shrink:0">→</span><strong style="color:#fff">B:</strong> Preguntas que descubren la urgencia</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--orange);font-weight:700;flex-shrink:0">→</span><strong style="color:#fff">C:</strong> Vender la cita como beneficio, no trámite</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 15px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">03 · El Guión Maestro</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span>El guión completo paso a paso</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span>Las 5 objeciones principales y cómo responderlas</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span>Los ganchos disponibles para cerrar</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 15px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">04 · Filtro Km y Modalidad</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--teal);font-weight:700;flex-shrink:0">→</span>B2C vs Oferta en Vivo — cuándo aplica cada una</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--teal);font-weight:700;flex-shrink:0">→</span>Año y kilometraje como filtro inmediato</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 15px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:8px">05 · Mapa de Objeciones</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--green);font-weight:700;flex-shrink:0">→</span>Herramienta interactiva — haz clic durante la llamada</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--green);font-weight:700;flex-shrink:0">→</span>9 objeciones con script exacto</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 15px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:8px">06–10 · Casos Especiales</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--orange);font-weight:700;flex-shrink:0">→</span>06 · Árbol de Dudas del Cliente</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--orange);font-weight:700;flex-shrink:0">→</span>07 · Filtro CATMAN — B2C vs Oferta en Vivo</li>
+        <li style="font-size:12px;color:var(--light);display:flex;gap:7px"><span style="color:var(--orange);font-weight:700;flex-shrink:0">→</span>08 · Oferta en Vivo · 09 · No Show · 10 · Confirmación</li>
+      </ul>
+    </div>
+  </div>
+  <div style="margin-top:10px;background:rgba(61,217,160,.06);border-left:3px solid var(--am-cyan);border-radius:0 8px 8px 0;padding:10px 16px">
+    <p style="font-size:12px;color:var(--light)"><strong style="color:var(--am-cyan)">Versión 2:</strong> Incluye filtros CATMAN, Oferta en Vivo, gestión de No Show, documentos atrasados y mapa interactivo de objeciones · JUN 2026 · Clicar.cl</p>
+  </div>
+</div>
+
+<!-- ══ SLIDE 3: EL CONTEXTO — QUIÉN ES ESTE CLIENTE ═══════════════════════ -->
+<div class="slide s-navy2" id="s3" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">El punto de partida</div>
+  <h2 class="h1" style="margin-bottom:10px">Este cliente <span class="g">ya dio el primer paso.</span><br><span style="color:var(--am-cyan)">¿Qué haces con eso?</span></h2>
+  <div class="cols3" style="margin-bottom:10px">
+    <div style="background:rgba(61,217,160,.08);border:1.5px solid var(--teal);border-radius:14px;padding:14px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">🚗</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:5px">LO QUE HIZO</p>
+      <p style="font-size:12px;color:var(--light);line-height:1.5">Ingresó su patente en <strong style="color:#fff">clicar.cl</strong> y recibió una tasación de su auto. No fue un accidente — tiene <strong style="color:#fff">intención de vender.</strong></p>
+    </div>
+    <div style="background:rgba(245,166,35,.08);border:1.5px solid var(--orange);border-radius:14px;padding:14px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">🧠</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:5px">LO QUE PIENSA</p>
+      <p style="font-size:12px;color:var(--light);line-height:1.5">No está comprando, está <strong style="color:#fff">vendiendo su patrimonio.</strong> Su mayor duda: <em style="color:var(--orange);font-style:normal">"¿Me están dando un precio justo?"</em></p>
+    </div>
+    <div style="background:rgba(230,57,70,.08);border:1.5px solid var(--accent);border-radius:14px;padding:14px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">⏱️</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:5px">TU VENTANA</p>
+      <p style="font-size:12px;color:var(--light);line-height:1.5">Contactas en <strong style="color:#fff">23 minutos promedio</strong> — excelente. Pero si el tono no convence en los <strong style="color:#fff">primeros 30 segundos,</strong> el lead se enfría.</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="bad">
+      <div class="lbl-bad">✗ Lo que NO es este trabajo</div>
+      <div class="li-bad"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span>No es cobrar una deuda — no llames como agente de cobranza</div>
+      <div class="li-bad"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span>No es venderle un auto — él quiere vender el suyo</div>
+      <div class="li-bad"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span>No es un trámite — es una oportunidad de compra para Americar</div>
+    </div>
+    <div class="good">
+      <div class="lbl-good">✓ Lo que SÍ es este trabajo</div>
+      <div class="li-good"><span style="color:var(--green);font-weight:700;flex-shrink:0">→</span>Eres el <strong style="color:#fff">asesor de precio</strong> que le puede confirmar si la tasación es real</div>
+      <div class="li-good"><span style="color:var(--green);font-weight:700;flex-shrink:0">→</span>Tu objetivo es <strong style="color:#fff">una cita de inspección</strong> — nada más, nada menos</div>
+      <div class="li-good"><span style="color:var(--green);font-weight:700;flex-shrink:0">→</span>El cliente que llega a la sucursal <strong style="color:#fff">en su mayoría concreta la venta</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 4: LOS DATOS DUROS ════════════════════════════════════════════ -->
+<div class="slide s-blue" id="s4" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">Datos reales · 97 llamadas analizadas · MAY 2026</div>
+  <h2 class="h1" style="margin-bottom:10px"><span class="g">3 de cada 4</span> pérdidas son <span style="color:var(--accent)">prevenibles.</span><br>No es el cliente — es la ejecución.</h2>
+  <div class="kpi-row">
+    <div class="kpi" style="border-color:var(--accent)"><div class="num" style="color:var(--accent)">62%</div><div class="lbl">Falla del Agente<br>(ejecución)</div></div>
+    <div class="kpi" style="border-color:var(--orange)"><div class="num" style="color:var(--orange)">83%</div><div class="lbl">Tono robótico<br>o monótono</div></div>
+    <div class="kpi" style="border-color:var(--teal)"><div class="num" style="color:var(--teal)">59%</div><div class="lbl">Sin preguntas<br>de descubrimiento</div></div>
+    <div class="kpi" style="border-color:var(--accent)"><div class="num" style="color:var(--accent)">89%</div><div class="lbl">Sin segundo<br>intento de cierre</div></div>
+    <div class="kpi" style="border-color:var(--accent)"><div class="num" style="color:var(--accent)">43%</div><div class="lbl">No intentó<br>vender la cita</div></div>
+    <div class="kpi" style="border-color:var(--green)"><div class="num" style="color:var(--green)">23 min</div><div class="lbl">Contacto promedio<br>✅ ya está bien</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+    <div class="card ca" style="padding:14px">
+      <h3 style="color:var(--accent)">Por qué no agendaron</h3>
+      <ul style="list-style:none;margin-top:4px">
+        <li style="font-size:12px;color:var(--light);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:6px"><span style="color:var(--accent)">62%</span> Falla del agente — cliente estaba disponible</li>
+        <li style="font-size:12px;color:var(--light);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:6px"><span style="color:var(--orange)">25%</span> Timing — solo evaluando el precio de su auto</li>
+        <li style="font-size:12px;color:var(--light);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:6px"><span style="color:var(--teal)">12%</span> Fricción logística — sucursal lejos o sin horario</li>
+        <li style="font-size:12px;color:var(--light);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:6px"><span style="color:var(--gray)">8%</span> Brecha de precio — expectativa muy alta</li>
+        <li style="font-size:12px;color:var(--light);padding:4px 0;display:flex;gap:6px"><span style="color:var(--gray)">5%</span> Sin decisión — auto de familiar o en prenda</li>
+      </ul>
+    </div>
+    <div class="card cg" style="padding:14px">
+      <h3 style="color:var(--green)">El perfil del cliente sin agenda</h3>
+      <ul style="list-style:none;margin-top:4px">
+        <li style="font-size:12px;color:var(--light);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:6px"><span style="color:var(--green)">40%</span> <strong style="color:#fff">Pragmático</strong> — quiere datos concretos, poco tiempo</li>
+        <li style="font-size:12px;color:var(--light);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:6px"><span style="color:var(--teal)">25%</span> <strong style="color:#fff">Timing</strong> — no tiene urgencia real, solo curiosidad</li>
+        <li style="font-size:12px;color:var(--light);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:6px"><span style="color:var(--orange)">7%</span> <strong style="color:#fff">Frustrado-Precio</strong> — precio bajo su expectativa</li>
+        <li style="font-size:12px;color:var(--light);padding:4px 0;display:flex;gap:6px"><span style="color:var(--gray)">6%</span> <strong style="color:#fff">Desconfiado</strong> — necesita validación antes de decidir</li>
+      </ul>
+      <div style="margin-top:8px;background:rgba(110,231,183,.1);border-radius:6px;padding:6px 10px">
+        <p style="font-size:11px;color:var(--green);font-weight:700">El cliente Pragmático es el más recuperable con el guión correcto</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 5: LOS 3 PILARES — OVERVIEW ══════════════════════════════════ -->
+<div class="slide s-navy" id="s5" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">El framework de la llamada exitosa</div>
+  <h2 class="h1" style="margin-bottom:12px">Los <span class="t">3 Pilares</span> de la llamada que <span class="g">agenda</span></h2>
+  <div class="cols3">
+    <div style="background:linear-gradient(135deg,rgba(21,128,61,.12),rgba(21,128,61,.04));border:1.5px solid rgba(21,128,61,.5);border-radius:16px;padding:18px">
+      <div style="font-size:3rem;font-weight:900;opacity:.15;line-height:1;color:#fff;margin-bottom:-6px">A</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#86efac;margin-bottom:8px">Pilar A — Apertura</p>
+      <h3 style="font-size:15px;font-weight:800;margin-bottom:8px;color:#fff">Conecta con <em style="color:#86efac;font-style:normal">su</em> auto</h3>
+      <p style="font-size:12.5px;color:var(--light);line-height:1.55">Menciona la marca, modelo y año tasado desde el primer segundo. El cliente debe sentir que lo conoces, no que estás siguiendo un guión genérico.</p>
+      <div style="margin-top:10px;background:rgba(230,57,70,.15);border-radius:6px;padding:6px 10px">
+        <p style="font-size:11px;color:#fca5a5;font-weight:700">Hoy: 56% apertura deficiente — el agente no menciona el auto</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(29,78,216,.12),rgba(29,78,216,.04));border:1.5px solid rgba(29,78,216,.5);border-radius:16px;padding:18px">
+      <div style="font-size:3rem;font-weight:900;opacity:.15;line-height:1;color:#fff;margin-bottom:-6px">B</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#93c5fd;margin-bottom:8px">Pilar B — Descubrimiento</p>
+      <h3 style="font-size:15px;font-weight:800;margin-bottom:8px;color:#fff">Pregunta <em style="color:#93c5fd;font-style:normal">antes</em> de proponer</h3>
+      <p style="font-size:12.5px;color:var(--light);line-height:1.55">2-3 preguntas abiertas para detectar motivación, urgencia y situación real del auto. Sin esto, aplicas el mismo guión para todos y fallas con el 59%.</p>
+      <div style="margin-top:10px;background:rgba(230,57,70,.15);border-radius:6px;padding:6px 10px">
+        <p style="font-size:11px;color:#fca5a5;font-weight:700">Hoy: 87% escucha deficiente — no se hacen preguntas de fondo</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(124,58,237,.04));border:1.5px solid rgba(124,58,237,.5);border-radius:16px;padding:18px">
+      <div style="font-size:3rem;font-weight:900;opacity:.15;line-height:1;color:#fff;margin-bottom:-6px">C</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c4b5fd;margin-bottom:8px">Pilar C — Cierre</p>
+      <h3 style="font-size:15px;font-weight:800;margin-bottom:8px;color:#fff">Vende el <em style="color:#c4b5fd;font-style:normal">beneficio</em>, no el trámite</h3>
+      <p style="font-size:12.5px;color:var(--light);line-height:1.55">La inspección no es una obligación — es el paso que <em style="color:var(--orange);font-style:normal">garantiza su precio</em>, sin compromiso, en 20 minutos. Insiste al menos dos veces.</p>
+      <div style="margin-top:10px;background:rgba(230,57,70,.15);border-radius:6px;padding:6px 10px">
+        <p style="font-size:11px;color:#fca5a5;font-weight:700">Hoy: 98% cierre deficiente — el peor número de los 3 pilares</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 6: PILAR A — APERTURA ════════════════════════════════════════ -->
+<div class="slide s-blue" id="s6" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">Pilar A — Apertura</div>
+  <h2 class="h1" style="margin-bottom:10px">Los primeros <span class="g">20 segundos</span> deciden si el cliente <span style="color:var(--accent)">cuelga o escucha</span></h2>
+  <div class="cols2" style="gap:16px">
+    <div>
+      <div class="bad" style="margin-bottom:10px">
+        <div class="lbl-bad">✗ Apertura genérica — lo que hace el 83%</div>
+        <div class="scr" style="background:rgba(230,57,70,.06);border-color:rgba(230,57,70,.25);margin-top:8px">
+          <span class="scr-lbl" style="color:#fca5a5">Así NO</span>
+          "Hola [Nombre], soy [Agente] de Americar, te llamo porque <strong style="color:#fca5a5">realizaste una tasación</strong> en nuestro portal y quería saber si aún te interesa vender tu vehículo..."
+        </div>
+        <ul style="list-style:none;margin-top:8px">
+          <li style="font-size:11.5px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> No menciona el auto específico — el cliente siente que es uno más</li>
+          <li style="font-size:11.5px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Tono de cobranza — monótono, no de asesoría</li>
+          <li style="font-size:11.5px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Pregunta de sí/no — le facilita el "no" al cliente</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="good">
+        <div class="lbl-good">✓ Apertura que conecta — lo que hace el top</div>
+        <div class="scr" style="margin-top:8px">
+          <span class="scr-lbl">Así SÍ</span>
+          "Hola <strong>[Nombre]</strong>, soy <strong>[Agente]</strong> de Americar. Vi que tasaste tu <strong style="color:var(--teal)">[Marca] [Modelo] año [Año]</strong> hace un rato en clicar.cl — te llamaba justamente para conversar sobre esa tasación <em>y contarte cómo funciona el proceso de compra.</em> ¿Tienes un par de minutos?"
+        </div>
+        <ul style="list-style:none;margin-top:8px">
+          <li style="font-size:11.5px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> Nombra el auto exacto — el cliente confirma que lo conoces</li>
+          <li style="font-size:11.5px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> "Contarte cómo funciona" — genera curiosidad, no presión</li>
+          <li style="font-size:11.5px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> Pregunta de permiso — respeto que abre el diálogo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:10px;background:rgba(61,217,160,.06);border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:10px 16px">
+    <p style="font-size:12.5px;color:#fff"><strong style="color:var(--teal)">Regla de oro A:</strong> Los primeros 10 segundos deben incluir la marca y modelo del auto. Si no los dices, el cliente asume que eres un call center genérico y se cierra.</p>
+  </div>
+  <div style="margin-top:8px;background:rgba(245,166,35,.08);border-left:4px solid var(--orange);border-radius:0 10px 10px 0;padding:8px 16px">
+    <p style="font-size:12px;color:#fff"><strong style="color:var(--orange)">Paso inmediato tras la apertura:</strong> Preguntar km y año antes de continuar. Ver siguiente slide →</p>
+  </div>
+</div>
+
+<!-- ══ SLIDE 7: PILAR B — DESCUBRIMIENTO ══════════════════════════════════ -->
+<div class="slide s-navy2" id="s7" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">Pilar B — Descubrimiento</div>
+  <h2 class="h1" style="margin-bottom:10px">Pregunta <span class="t">antes</span> de proponer la cita.<br><span style="color:var(--light);font-size:.7em;font-weight:400">El 59% no hace ninguna pregunta de fondo — y pierde el lead.</span></h2>
+  <div class="cols2" style="gap:16px">
+    <div>
+      <p style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">Las 3 preguntas que cambian la llamada</p>
+      <div class="step" style="border-left-color:var(--teal)">
+        <div class="step-n" style="background:var(--teal);color:#0c2838">1</div>
+        <div class="step-t"><strong>¿Qué te motivó a tasar el auto?</strong><br><span style="font-size:11.5px;color:var(--gray)">Descubre si quiere renovar, necesita liquidez o solo curiosidad</span></div>
+      </div>
+      <div class="step" style="border-left-color:var(--orange)">
+        <div class="step-n" style="background:var(--orange)">2</div>
+        <div class="step-t"><strong>¿Para cuándo estás pensando en venderlo?</strong><br><span style="font-size:11.5px;color:var(--gray)">Detecta urgencia real. "En 2-3 meses" ≠ "lo antes posible"</span></div>
+      </div>
+      <div class="step" style="border-left-color:var(--green)">
+        <div class="step-n" style="background:var(--green);color:#0c2838">3</div>
+        <div class="step-t"><strong>¿Tú eres el titular del vehículo?</strong><br><span style="font-size:11.5px;color:var(--gray)">Evita perder tiempo con quien no puede decidir</span></div>
+      </div>
+      <div style="background:rgba(230,57,70,.08);border-radius:8px;padding:8px 12px;margin-top:8px">
+        <p style="font-size:11.5px;color:var(--light)"><strong style="color:var(--accent)">Lo que revelan los datos:</strong> en las llamadas exitosas (Capa 3), el cliente compartió su motivación y el agente la usó como palanca para el cierre.</p>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Cómo leer las señales del cliente</p>
+      <div class="card co" style="padding:12px;margin-bottom:8px">
+        <h3 style="color:var(--orange)">🟡 Timing (25% de los casos)</h3>
+        <p style="font-size:12px;color:var(--light);margin-top:4px">Dice: "Estaba mirando cuánto podría salir..." o "No tengo apuro".<br><strong style="color:#fff">Respuesta:</strong> "Perfecto, la inspección es justamente para que tengas un precio oficial — sin compromiso. ¿Qué te parece el [día]?"</p>
+      </div>
+      <div class="card ct" style="padding:12px;margin-bottom:8px">
+        <h3 style="color:var(--teal)">🟢 Con urgencia (agendar inmediato)</h3>
+        <p style="font-size:12px;color:var(--light);margin-top:4px">Dice: "Sí, lo quiero vender pronto" o "Necesito la plata".<br><strong style="color:#fff">Respuesta:</strong> Ofrecer el bono de urgencia. Cerrar la cita en la misma llamada.</p>
+      </div>
+      <div class="card ca" style="padding:12px">
+        <h3 style="color:var(--accent)">🔴 Precio frustrado</h3>
+        <p style="font-size:12px;color:var(--light);margin-top:4px">Dice: "El precio me pareció bajo..."<br><strong style="color:#fff">Respuesta:</strong> "El precio web es un estimado — la inspección presencial puede ajustarlo según el estado real de tu auto."</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 8: PILAR C — CIERRE ════════════════════════════════════════════ -->
+<div class="slide s-navy" id="s8" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">Pilar C — Cierre</div>
+  <h2 class="h1" style="margin-bottom:10px">No estás pidiendo un <span style="color:var(--accent)">favor.</span><br>Estás ofreciendo <span class="g">garantizarle su precio.</span></h2>
+  <div class="cols2" style="gap:16px">
+    <div>
+      <div class="bad" style="margin-bottom:10px">
+        <div class="lbl-bad">✗ La cita como trámite — 43% de las llamadas</div>
+        <div class="scr" style="background:rgba(230,57,70,.06);border-color:rgba(230,57,70,.25);margin-top:8px;font-size:12.5px">
+          <span class="scr-lbl" style="color:#fca5a5">Así NO</span>
+          "...entonces te llamo para agendar una <strong style="color:#fca5a5">cita de inspección</strong>, que sería el proceso para que puedas vender tu auto. ¿Tendrías disponibilidad?"
+        </div>
+        <p style="font-size:11.5px;color:var(--light);margin-top:8px;line-height:1.5">El cliente escucha "proceso" y "inspección" — suena a papeleo, burocracia, y a que le tomarán el tiempo. Fácil decir no.</p>
+      </div>
+      <div style="background:rgba(61,217,160,.06);border-radius:10px;padding:10px 14px">
+        <p style="font-size:11.5px;color:var(--light)"><strong style="color:var(--teal)">El dato duro:</strong> el 89% de los agentes que recibieron un primer "no" <strong style="color:#fff">no intentaron un segundo cierre.</strong> La venta se hace en el segundo intento.</p>
+      </div>
+    </div>
+    <div>
+      <div class="good">
+        <div class="lbl-good">✓ La cita como beneficio — las llamadas exitosas</div>
+        <div class="scr" style="margin-top:8px;font-size:12.5px">
+          <span class="scr-lbl">Así SÍ</span>
+          "Lo que hacemos es una <strong style="color:var(--teal)">revisión presencial de tu auto — dura unos 20 minutos</strong>, no tiene ningún costo ni compromiso para ti, y es el paso que nos permite <em>confirmar o mejorar el precio</em> que te apareció en la web. ¿Qué te parece si lo hacemos el <strong>[día]</strong>?"
+        </div>
+        <div class="step" style="border-left-color:var(--green);margin-top:10px">
+          <div class="step-n" style="background:var(--green);color:#0c2838">2°</div>
+          <div class="step-t"><strong>Si dice no: segundo cierre inmediato</strong><br><span style="font-size:11.5px;color:var(--gray)">"Entiendo, ¿qué día te acomodaría mejor? También tenemos sucursal en [alternativa]."</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 9: EL GUIÓN MAESTRO ═══════════════════════════════════════════ -->
+<div class="slide s-blue" id="s9" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">El Guión Maestro — llamada completa</div>
+  <h2 class="h1" style="margin-bottom:10px">Del saludo al <span class="g">sí, agendo</span> — paso a paso</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div>
+      <div class="step" style="border-left-color:#86efac">
+        <div class="step-n" style="background:#86efac;color:#0c2838;font-size:10px">A1</div>
+        <div class="step-t"><strong>📞 Conectar con el auto específico</strong><br><span style="font-size:11px;color:var(--gray)">"Hola [Nombre], soy [Agente] de Americar. Vi que tasaste tu <em style="color:var(--teal);font-style:normal">[Marca Modelo Año]</em> — te llamo para contarte cómo funciona el proceso de compra. ¿Tienes 2 minutos?"</span></div>
+      </div>
+      <div class="step" style="border-left-color:#86efac">
+        <div class="step-n" style="background:#86efac;color:#0c2838;font-size:10px">A2</div>
+        <div class="step-t"><strong>😊 Tono asesor, no de cobranza</strong><br><span style="font-size:11px;color:var(--gray)">Habla con energía moderada. Sonríe — se escucha. No leas el guión — conócelo.</span></div>
+      </div>
+      <div class="step" style="border-left-color:#93c5fd">
+        <div class="step-n" style="background:#93c5fd;color:#0c2838;font-size:10px">B1</div>
+        <div class="step-t"><strong>💬 Preguntar motivación</strong><br><span style="font-size:11px;color:var(--gray)">"¿Qué te motivó a tasar el auto?" — escucha la respuesta completa, no interrumpas.</span></div>
+      </div>
+      <div class="step" style="border-left-color:#93c5fd">
+        <div class="step-n" style="background:#93c5fd;color:#0c2838;font-size:10px">B2</div>
+        <div class="step-t"><strong>⏰ Detectar urgencia y titularidad</strong><br><span style="font-size:11px;color:var(--gray)">"¿Para cuándo lo estás pensando?" · "¿El auto está a tu nombre?"</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="step" style="border-left-color:#c4b5fd">
+        <div class="step-n" style="background:#c4b5fd;color:#0c2838;font-size:10px">C1</div>
+        <div class="step-t"><strong>🗓️ Vender la inspección como beneficio</strong><br><span style="font-size:11px;color:var(--gray)">"La revisión dura 20 min, sin costo ni compromiso — es el paso para confirmar o mejorar tu precio. ¿Te acomoda el [día/hora]?"</span></div>
+      </div>
+      <div class="step" style="border-left-color:#c4b5fd">
+        <div class="step-n" style="background:#c4b5fd;color:#0c2838;font-size:10px">C2</div>
+        <div class="step-t"><strong>🔄 Primer "no" → no rendirse</strong><br><span style="font-size:11px;color:var(--gray)">"Entiendo. ¿Qué día te acomodaría mejor? También tenemos sucursal en [alternativa] si la distancia es el tema."</span></div>
+      </div>
+      <div class="step" style="border-left-color:#c4b5fd">
+        <div class="step-n" style="background:#c4b5fd;color:#0c2838;font-size:10px">C3</div>
+        <div class="step-t"><strong>🎁 Segundo cierre con gancho si aplica</strong><br><span style="font-size:11px;color:var(--gray)">Si hay urgencia: "Tenemos una oferta de primer momento disponible esta semana — ¿agendamos hoy?"</span></div>
+      </div>
+      <div class="step" style="border-left-color:var(--orange)">
+        <div class="step-n" style="background:var(--orange);font-size:10px">✓</div>
+        <div class="step-t"><strong>✅ Confirmar y cerrar con datos</strong><br><span style="font-size:11px;color:var(--gray)">Confirma día, hora, sucursal y dirección. Repite el nombre del cliente al cerrar.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 10: LAS 5 OBJECIONES ═══════════════════════════════════════════ -->
+<div class="slide s-navy2" id="s10" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">Manejo de objeciones — datos reales</div>
+  <h2 class="h1" style="margin-bottom:12px">Las <span style="color:var(--accent)">5 objeciones</span> reales y <span class="g">cómo responderlas</span></h2>
+  <div style="display:flex;flex-direction:column;gap:7px">
+    <div class="obj-row">
+      <div class="obj-objecion">⏱️ "Por ahora no, estoy muy ocupado/a"</div>
+      <div class="obj-arrow">→</div>
+      <div class="obj-respuesta">"Perfecto, <strong style="color:var(--teal)">justamente por eso</strong> — son solo 20 minutos, lo coordinas cuando tú lo decides. ¿Qué día te acomoda más esta semana o la próxima?"</div>
+    </div>
+    <div class="obj-row">
+      <div class="obj-objecion">💸 "El precio me pareció muy bajo"</div>
+      <div class="obj-arrow">→</div>
+      <div class="obj-respuesta">"El precio web es un estimado base. La inspección presencial <strong style="color:var(--teal)">puede ajustarlo según el estado real</strong> de tu auto — ha pasado que el precio final es más alto. <em style="color:var(--orange);font-style:normal">Además, si concretas la venta podemos sumar un bono adicional y un premio solo por asistir.</em> ¿Lo revisamos?"</div>
+    </div>
+    <div class="obj-row">
+      <div class="obj-objecion">📍 "La sucursal me queda lejos"</div>
+      <div class="obj-arrow">→</div>
+      <div class="obj-respuesta">"Entiendo. Tenemos sucursal también en <strong style="color:var(--teal)">[alternativa]</strong>. Y cubrimos el Uber de vuelta cuando concluye la venta — no tienes que preocuparte del regreso."</div>
+    </div>
+    <div class="obj-row">
+      <div class="obj-objecion">🤔 "Todavía no lo he decidido / lo tengo que pensar"</div>
+      <div class="obj-arrow">→</div>
+      <div class="obj-respuesta">"Claro, sin problema. La inspección <strong style="color:var(--teal)">no te compromete a vender</strong> — solo te da el precio oficial para que tomes la decisión con información real. ¿Qué te parece el [día]?"</div>
+    </div>
+    <div class="obj-row">
+      <div class="obj-objecion">🚪 "Ya lo vendí / ya fui a otro lado"</div>
+      <div class="obj-arrow">→</div>
+      <div class="obj-respuesta">"Perfecto, me alegra que lo hayas resuelto. Si en el futuro tienes otro vehículo, <strong style="color:var(--teal)">cuéntame</strong> — Americar compra en promedio en 1 hora. Que te vaya bien."</div>
+    </div>
+  </div>
+  <div style="margin-top:8px;background:rgba(230,57,70,.08);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:8px 14px">
+    <p style="font-size:12px;color:var(--light)"><strong style="color:var(--accent)">La regla del segundo intento:</strong> el 60% de los agentes acepta el primer "no" sin rebatir. <strong style="color:#fff">Siempre intenta un segundo cierre</strong> con alternativa concreta antes de cerrar la llamada.</p>
+  </div>
+</div>
+
+<!-- ══ SLIDE 11: LOS GANCHOS DISPONIBLES ══════════════════════════════════ -->
+<div class="slide s-navy" id="s11" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">Herramientas de cierre — úsalas con criterio</div>
+  <h2 class="h1" style="margin-bottom:10px">Los ganchos: <span class="o">solo cuando el cliente</span><br><span class="g">necesita el último empujón</span></h2>
+  <div class="cols4">
+    <div style="background:linear-gradient(135deg,rgba(245,166,35,.12),rgba(245,166,35,.04));border:1.5px solid rgba(245,166,35,.5);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">💰</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:5px">Bono de Primer Momento</p>
+      <p style="font-size:12px;color:var(--light);line-height:1.5">Disponible para clientes con urgencia real. Solo mencionarlo si el cliente muestra interés y necesita el último empujón.</p>
+      <div style="margin-top:8px;background:rgba(245,166,35,.12);border-radius:6px;padding:5px 8px">
+        <p style="font-size:11px;color:var(--orange);font-weight:700">Cuidar margen — no ofrecerlo de entrada</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(61,217,160,.12),rgba(61,217,160,.04));border:1.5px solid rgba(61,217,160,.5);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">🚗</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:5px">Uber de Vuelta</p>
+      <p style="font-size:12px;color:var(--light);line-height:1.5">Para clientes con fricción logística: "Cubrimos tu traslado de regreso cuando concluye la venta."</p>
+      <div style="margin-top:8px;background:rgba(61,217,160,.12);border-radius:6px;padding:5px 8px">
+        <p style="font-size:11px;color:var(--teal);font-weight:700">Muy efectivo con clientes lejos</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(29,78,216,.12),rgba(29,78,216,.04));border:1.5px solid rgba(29,78,216,.5);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">⚖️</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#93c5fd;margin-bottom:5px">Asesoría Legal Gratis</p>
+      <p style="font-size:12px;color:var(--light);line-height:1.5">Para clientes con prenda activa o dudas legales: "Nos encargamos del alzamiento y la transferencia — sin costo para ti."</p>
+      <div style="margin-top:8px;background:rgba(29,78,216,.12);border-radius:6px;padding:5px 8px">
+        <p style="font-size:11px;color:#93c5fd;font-weight:700">Genera confianza en desconfiados</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(110,231,183,.12),rgba(110,231,183,.04));border:1.5px solid rgba(110,231,183,.5);border-radius:14px;padding:16px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">⚡</div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:5px">Pago en 1 Hora</p>
+      <p style="font-size:12px;color:var(--light);line-height:1.5">Para clientes que necesitan liquidez: "Desde que llegas hasta que tienes el pago en tu cuenta: 1 hora."</p>
+      <div style="margin-top:8px;background:rgba(110,231,183,.12);border-radius:6px;padding:5px 8px">
+        <p style="font-size:11px;color:var(--green);font-weight:700">El más poderoso con urgencia de liquidez</p>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="bad">
+      <div class="lbl-bad">✗ Error frecuente</div>
+      <p style="font-size:12px;color:var(--light);">Ofrecer el bono desde el inicio sin diagnosticar. Esto quema margen y el cliente lo percibe como desesperación.</p>
+    </div>
+    <div class="good">
+      <div class="lbl-good">✓ Cuándo usarlos</div>
+      <p style="font-size:12px;color:var(--light);">Primero detecta (Pilar B). Cierra sin gancho (Pilar C). Solo si el segundo cierre falla, introduce el gancho más relevante según el perfil del cliente.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 12: COMPARATIVA ÉXITO VS FRACASO ═════════════════════════════ -->
+<div class="slide s-blue" id="s12" style="justify-content:flex-start;padding-top:3.5vh">
+  <div class="tag">Llamadas reales analizadas · MAY 2026</div>
+  <h2 class="h1" style="margin-bottom:10px">La diferencia entre el agente <span style="color:var(--accent)">que pierde</span><br>y el que <span class="g">agenda</span></h2>
+  <div class="cols2" style="gap:14px">
+    <div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">✗ Agente sin agenda — patrón más frecuente</p>
+      <div class="scr" style="background:rgba(230,57,70,.06);border-color:rgba(230,57,70,.25);font-size:12px">
+        <span class="scr-lbl" style="color:#fca5a5">Transcripción real (resumida)</span>
+        Agente: "Hola, te llamo de Americar por una tasación que hiciste..."<br>
+        Cliente: "Sí, pero <em style="color:var(--orange)">no tengo tiempo ahora.</em>"<br>
+        Agente: <strong style="color:#fca5a5">"Ah, está bien, te llamo después entonces. Que tengas buen día."</strong>
+      </div>
+      <ul style="list-style:none;margin-top:10px">
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Apertura genérica — no mencionó el auto</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Ninguna pregunta de descubrimiento</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Aceptó el primer "no" en 3 segundos</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> No vendió la cita como beneficio</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Cero intentos de rebatir la objeción</li>
+      </ul>
+    </div>
+    <div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:8px">✓ Agente que agenda — patrón exitoso (Capa 3)</p>
+      <div class="scr" style="font-size:12px">
+        <span class="scr-lbl">Transcripción real (resumida)</span>
+        Agente: "Hola <strong>Carlos</strong>, soy [Nombre] de Americar. Vi que tasaste tu <strong style="color:var(--teal)">Toyota Yaris 2019</strong> hace un rato — te llamo para contarte cómo funciona el proceso..."<br>
+        Cliente: "Sí, ando buscando cambiarme de auto."<br>
+        Agente: "<em style="color:var(--orange)">¡Perfecto! ¿Para cuándo lo estás pensando?</em>"<br>
+        Cliente: "Este mes si es posible."<br>
+        Agente: "<strong style="color:var(--teal)">Entonces hagámoslo esta semana — son 20 minutos, sin compromiso, y te confirmamos el precio. ¿El miércoles o jueves te acomoda?</strong>"
+      </div>
+      <ul style="list-style:none;margin-top:10px">
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> Mencionó el auto exacto desde el primer segundo</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> Detectó motivación: cambio de auto</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> Detectó urgencia: "este mes"</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> Vendió la cita como beneficio, no trámite</li>
+        <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green)">→</span> Ofreció alternativa de fecha — cierre asertivo</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 13: PROTOCOLO MÍNIMO DESCARGABLE ═════════════════════════════ -->
+<div class="slide s-navy2" id="s13" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Protocolo mínimo · Descargable</div>
+  <h2 class="h1" style="margin-bottom:10px">Tu tarjeta de <span class="t">escritorio</span> —<br><span style="color:var(--light);font-size:.75em;font-weight:400">7 pasos que no pueden faltar en ninguna llamada</span></h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+    <!-- Col izquierda: pasos 1-4 -->
+    <div style="display:flex;flex-direction:column;gap:5px;grid-column:span 2">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(21,128,61,.08);border:1.5px solid rgba(21,128,61,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">📞</span>
+          <div><strong style="font-size:11px;color:#86efac">1. Abre con el auto</strong><br><span style="font-size:10px;color:var(--light)">"...Vi que tasaste tu [Marca Modelo Año]..."</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(21,128,61,.08);border:1.5px solid rgba(21,128,61,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">😊</span>
+          <div><strong style="font-size:11px;color:#86efac">2. Tono asesor</strong><br><span style="font-size:10px;color:var(--light)">Sonríe — se escucha. No de cobranza.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(29,78,216,.08);border:1.5px solid rgba(29,78,216,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">💬</span>
+          <div><strong style="font-size:11px;color:#93c5fd">3. Pregunta motivación</strong><br><span style="font-size:10px;color:var(--light)">"¿Qué te motivó a tasar el auto?"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(29,78,216,.08);border:1.5px solid rgba(29,78,216,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">⏰</span>
+          <div><strong style="font-size:11px;color:#93c5fd">4. Detecta urgencia</strong><br><span style="font-size:10px;color:var(--light)">"¿Para cuándo?" · "¿Eres el titular?"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(124,58,237,.08);border:1.5px solid rgba(124,58,237,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">🗓️</span>
+          <div><strong style="font-size:11px;color:#c4b5fd">5. Vende la cita</strong><br><span style="font-size:10px;color:var(--light)">"20 min, sin costo — confirma o mejora tu precio"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(124,58,237,.08);border:1.5px solid rgba(124,58,237,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">🔄</span>
+          <div><strong style="font-size:11px;color:#c4b5fd">6. Al primer "no": no te rindas</strong><br><span style="font-size:10px;color:var(--light)">Rebate con día o sucursal alternativa.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(5,150,105,.08);border:1.5px solid rgba(5,150,105,.4);border-radius:8px;padding:7px 10px;grid-column:span 2">
+          <span style="font-size:1.1rem;flex-shrink:0">✅</span>
+          <div><strong style="font-size:11px;color:#6ee7b7">7. Confirma y cierra</strong><br><span style="font-size:10px;color:var(--light)">Confirma día · hora · sucursal · dirección. Repite su nombre al despedirte.</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- Col derecha: descarga -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:14px;border:1px solid rgba(255,255,255,.07)">
+      <div style="font-size:3rem">🖨️</div>
+      <h3 style="font-size:15px;font-weight:800;color:#fff;line-height:1.2">Descarga la tarjeta<br>para tu escritorio</h3>
+      <p style="font-size:11.5px;color:var(--light);line-height:1.4">Formato <strong style="color:#fff">media carta · fondo blanco</strong> — imprime y tenla al lado del teléfono.</p>
+      <button class="btn-dl" onclick="descargarTarjeta()">⬇ Descargar PNG</button>
+      <p style="font-size:10px;color:var(--gray)">También puedes imprimir desde el navegador</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CHEAT SHEET DESCARGABLE ════════════════════════════════════ -->
+<div id="modal-overlay" onclick="cerrarModal(event)">
+  <div id="modal-box">
+    <button id="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+    <!-- ── TARJETA MEDIA CARTA (blanca) ── -->
+    <div id="cheatcard">
+      <div class="cc-header">
+        <div>
+          <div class="cc-brand">AMERICAR</div>
+          <div class="cc-sub">Compra de Autos · Contact Center</div>
+        </div>
+        <div class="cc-title">
+          <p>Protocolo Mínimo</p>
+          <h2>Llamada<br>de Compra</h2>
+        </div>
+      </div>
+      <div class="cc-body">
+        <div class="cc-step cc-step-a">
+          <div class="cc-num cc-num-a">1</div>
+          <div class="cc-txt">
+            <h4>📞 Abre con el auto específico</h4>
+            <p>"Hola <em>[Nombre]</em>, soy <em>[Agente]</em> de Americar. Vi que tasaste tu <em>[Marca · Modelo · Año]</em> — te llamo para contarte cómo funciona el proceso. ¿Tienes 2 minutos?"</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-a">
+          <div class="cc-num cc-num-a">2</div>
+          <div class="cc-txt">
+            <h4>😊 Tono asesor — no de cobranza</h4>
+            <p>Sonríe al hablar — <em>se escucha</em>. Energía moderada. No leas el guión: conócelo.</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-b">
+          <div class="cc-num cc-num-b">3</div>
+          <div class="cc-txt">
+            <h4>💬 Pregunta la motivación</h4>
+            <p>"¿Qué te motivó a tasar el auto?" — <em>escucha la respuesta completa</em>, no interrumpas.</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-b">
+          <div class="cc-num cc-num-b">4</div>
+          <div class="cc-txt">
+            <h4>⏰ Detecta urgencia y titularidad</h4>
+            <p>"¿Para cuándo lo estás pensando?" &nbsp;·&nbsp; "<em>¿El auto está a tu nombre?</em>"</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-c">
+          <div class="cc-num cc-num-c">5</div>
+          <div class="cc-txt">
+            <h4>🗓️ Vende la cita como beneficio</h4>
+            <p>"Son <em>20 minutos</em>, sin costo ni compromiso — es el paso para confirmar o <em>mejorar tu precio</em>. ¿Te acomoda el <em>[día/hora]</em>?"</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-c">
+          <div class="cc-num cc-num-c">6</div>
+          <div class="cc-txt">
+            <h4>🔄 Al primer "no": no te rindas</h4>
+            <p>"Entiendo — ¿qué día te acomoda mejor?" · "También tenemos sucursal en <em>[alternativa]</em>." Intenta <em>al menos dos veces</em>.</p>
+          </div>
+        </div>
+        <div class="cc-step cc-step-ok">
+          <div class="cc-num cc-num-ok">7</div>
+          <div class="cc-txt">
+            <h4>✅ Confirma y cierra</h4>
+            <p>Confirma <em>día · hora · sucursal · dirección</em>. Repite el nombre del cliente al despedirte.</p>
+          </div>
+        </div>
+      </div>
+      <div class="cc-cta">
+        <div class="icon">🎯</div>
+        <div class="txt">
+          <p>Tu único objetivo en cada llamada</p>
+          <h3>Una cita de inspección agendada</h3>
+        </div>
+      </div>
+      <div class="cc-footer">
+        <span>Americar · Contact Center Compra 2026</span>
+        <span>Basado en 97 llamadas analizadas · clicar.cl</span>
+      </div>
+    </div><!-- /cheatcard -->
+  </div>
+</div>
+
+<!-- ══ SLIDE 14: FILTRO DE KM ════════════════════════════════════════════ -->
+<div class="slide s-navy2" id="s14" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Primer filtro tras la apertura</div>
+  <h2 class="h1" style="margin-bottom:10px">Antes de continuar: confirma <span class="o">km y año</span></h2>
+  <div class="scr" style="margin-bottom:12px"><span class="scr-lbl">Script a usar justo después de la apertura</span>"¿Me confirmas cuántos kilómetros tiene el auto y su año, por favor?"</div>
+  <div class="cols3" style="margin-bottom:12px">
+    <div class="card ct" style="padding:14px;text-align:center">
+      <div style="font-size:1.8rem;margin-bottom:6px">✅</div>
+      <h3 style="color:var(--teal);font-size:12px;margin-bottom:6px">B2C — CONTINUAR</h3>
+      <p style="font-size:12px;color:var(--light);line-height:1.5;margin-bottom:8px"><strong style="color:#fff">&lt; 150.000 km</strong><br>y año <strong style="color:#fff">2012 o más nuevo</strong></p>
+      <div class="scr" style="font-size:11px;padding:8px 12px"><span class="scr-lbl" style="font-size:9px">Script</span>"¿Aún estás interesad@ en venderlo? Te invito a escuchar nuestra oferta."</div>
+    </div>
+    <div class="card co" style="padding:14px;text-align:center">
+      <div style="font-size:1.8rem;margin-bottom:6px">🔄</div>
+      <h3 style="color:var(--orange);font-size:12px;margin-bottom:6px">OFERTA EN VIVO</h3>
+      <p style="font-size:12px;color:var(--light);line-height:1.5;margin-bottom:8px"><strong style="color:#fff">&gt; 150.000 km</strong><br>y/o año entre <strong style="color:#fff">2008 y 2011</strong></p>
+      <div class="scr" style="font-size:11px;padding:8px 12px;background:rgba(245,166,35,.06);border-color:rgba(245,166,35,.2)"><span class="scr-lbl" style="font-size:9px;color:var(--orange)">Acción</span>Ir a slide Oferta en Vivo</div>
+    </div>
+    <div class="card ca" style="padding:14px;text-align:center">
+      <div style="font-size:1.8rem;margin-bottom:6px">⛔</div>
+      <h3 style="color:var(--accent);font-size:12px;margin-bottom:6px">NO SE COMPRA</h3>
+      <p style="font-size:12px;color:var(--light);line-height:1.5;margin-bottom:8px">Año <strong style="color:#fff">2007 o anterior</strong><br>(bajo 2008)</p>
+      <div class="scr" style="font-size:11px;padding:8px 12px;background:rgba(230,57,70,.06);border-color:rgba(230,57,70,.2)"><span class="scr-lbl" style="font-size:9px;color:#fca5a5">Script</span>"Lamentablemente no podremos seguir con el proceso, pues no compramos autos con esas características."</div>
+    </div>
+  </div>
+  <div style="background:rgba(61,217,160,.06);border-left:4px solid var(--teal);border-radius:0 8px 8px 0;padding:8px 14px">
+    <p style="font-size:12px;color:var(--light)"><strong style="color:var(--teal)">Importante:</strong> Si el auto es para Oferta en Vivo por km/año, NO mencionar el motivo al cliente — solo indicar que se aplica esa modalidad.</p>
+  </div>
+</div>
+
+<!-- ══ SLIDE 15: MAPA DE OBJECIONES INTERACTIVO ══════════════════════════ -->
+<div class="slide s-navy2" id="s15" style="justify-content:flex-start;padding-top:2.5vh">
+  <div class="tag">Herramienta activa — úsala durante la llamada</div>
+  <h2 class="h1" style="margin-bottom:6px">Mapa de <span class="g">Objeciones</span> — <span class="t">haz clic en lo que dice el cliente</span></h2>
+  <p style="font-size:12px;color:var(--gray);margin-bottom:10px">Haz clic en la tarjeta que corresponda para ver el script exacto. Puedes tener varias abiertas al mismo tiempo.</p>
+  <div class="acc-grid">
+    <!-- 1 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">💸</span>
+        <div class="lbl"><strong>Precio bajo / No conforme</strong><small>"El precio me pareció muy bajo..."</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Ten presente que el precio web es un estimado base — la inspección presencial puede ajustarlo según el estado real de tu auto, ha pasado que el precio final es más alto que la tasación web. Además, siempre intentaremos llegar al mejor precio para que nos elijas. Si concretas la venta podemos sumar un bono adicional y un <strong>premio de $50.000 solo por asistir</strong> en fecha y hora. ¿Lo revisamos juntos?</div></div>
+    </div>
+    <!-- 2 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">⏱️</span>
+        <div class="lbl"><strong>No tengo tiempo / Estoy ocupado</strong><small>"Por ahora no, estoy muy ocupado/a"</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Perfecto, justamente por eso — son solo <strong>20 minutos</strong>, lo coordinas cuando tú lo decides. ¿Qué día te acomoda mejor esta semana o la próxima?</div></div>
+    </div>
+    <!-- 3 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">📍</span>
+        <div class="lbl"><strong>La sucursal me queda lejos</strong><small>"Me queda muy lejos la sucursal..."</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Entiendo. Tenemos varias sucursales — ¿dónde estás ubicado para ofrecerte la más cercana? Además, <strong>cubrimos el traslado de regreso</strong> cuando concluye la venta.</div></div>
+    </div>
+    <!-- 4 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">📄</span>
+        <div class="lbl"><strong>Documentos atrasados</strong><small>"Mis documentos están al día / tengo doc atrasada"</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Sí, podemos comprar tu auto, pero sin la documentación al día no podremos realizar la prueba de ruta, por lo que se aplicará un descuento ante la posibilidad de eventuales fallas mecánicas. También podrás evaluar actualizar los documentos y luego vender. Siempre nuestros compradores te ayudarán a buscar la mejor alternativa. Recuerda que <strong>aceptar la cita no te compromete a vender</strong> — la última palabra siempre la tienes tú.</div></div>
+    </div>
+    <!-- 5 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">🔧</span>
+        <div class="lbl"><strong>Auto con falla / golpe</strong><small>"Mi auto tiene una falla / un golpe / luz encendida"</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Gracias por comentarnos. Dadas las condiciones de tu auto, podemos ofrecerte nuestra <strong>Oferta en Vivo</strong> — publicamos tu auto en una plataforma online donde más de 200 dealers aliados harán ofertas. No implica gasto alguno para ti, y tú decides si vender o no. ¿Te explico cómo funciona?</div></div>
+    </div>
+    <!-- 6 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">💳</span>
+        <div class="lbl"><strong>Quiero parte de pago / renovar</strong><small>"Quiero usar mi auto en parte de pago para otro"</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">¡Excelente alternativa! Si la automotora es del Grupo Americar, el dinero se puede transferir directamente de Clicar a la automotora — mucho más simple para ti. Si es otra automotora, el pago va directo a tu cuenta. En nuestro sitio tenemos más de <strong>3.000 autos en stock</strong> con convenientes precios y financiamiento. ¿Agendamos la inspección para partir con el proceso?</div></div>
+    </div>
+    <!-- 7 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">👥</span>
+        <div class="lbl"><strong>¿Pago a más de una persona?</strong><small>"¿Pueden pagar a dos personas?"</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Para compras normales el pago va a la cuenta del titular del auto — el mismo RUT del dueño y del CAV. Si tienes más de una cuenta, todas deben coincidir en RUT. Si vendes por poder, el pago se realiza al titular del CAV según el RUT que figura ahí. ¿Te queda claro? ¿Agendamos?</div></div>
+    </div>
+    <!-- 8 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">🤔</span>
+        <div class="lbl"><strong>Todavía no lo he decidido</strong><small>"Tengo que pensarlo / no lo he decidido aún"</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Claro, sin problema. <strong>La inspección no te compromete a vender</strong> — solo te da el precio oficial con inspección real para que tomes la decisión con información concreta. Aceptar la cita es completamente gratuito. ¿Qué te parece si lo dejamos agendado y puedes cancelar si cambias de opinión?</div></div>
+    </div>
+    <!-- 9 -->
+    <div class="acc-card">
+      <div class="acc-trigger">
+        <span class="icon">🚪</span>
+        <div class="lbl"><strong>Ya lo vendí / Fui a otro lado</strong><small>"Ya lo vendí / ya fui a otra empresa"</small></div>
+        <span class="arr">▶</span>
+      </div>
+      <div class="acc-content"><div class="acc-inner">Perfecto, me alegra que lo hayas resuelto. Si en el futuro tienes otro vehículo para vender, recuerda que en Americar/Clicar compramos en promedio en <strong>1 hora</strong> y el dinero va a tu cuenta el mismo día. Que te vaya muy bien.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 16: ÁRBOL DE DUDAS DEL CLIENTE ════════════════════════════════ -->
+<div class="slide s-blue" id="s16" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Árbol de decisión — ¿qué pregunta el cliente?</div>
+  <h2 class="h1" style="margin-bottom:10px">¿Qué pregunta el cliente? <span class="t">Aquí está el camino</span></h2>
+  <div class="cols2" style="gap:14px">
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div class="obj-row">
+        <div class="obj-objecion">"¿Me obliga a vender si acepto la cita?"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 8 / Pilar C</strong> — "La inspección no te compromete a vender. Es gratuita. La decisión siempre es tuya."</div>
+      </div>
+      <div class="obj-row">
+        <div class="obj-objecion">"¿Cuánto demora el pago?"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 11 Ganchos</strong> — "En 1 hora el dinero está en tu cuenta bancaria."</div>
+      </div>
+      <div class="obj-row">
+        <div class="obj-objecion">"El precio es muy bajo"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 15 Mapa</strong> → Objeción Precio — bono adicional y premio por asistir.</div>
+      </div>
+      <div class="obj-row">
+        <div class="obj-objecion">"Mis documentos están atrasados"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 17</strong> / Docs Atrasados — ver script completo.</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div class="obj-row">
+        <div class="obj-objecion">"Mi auto tiene una falla / golpe"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 17</strong> / Auto con falla → Oferta en Vivo.</div>
+      </div>
+      <div class="obj-row">
+        <div class="obj-objecion">"¿Pueden pagar a dos personas?"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 18</strong> / Pago múltiple — RUT del titular del CAV.</div>
+      </div>
+      <div class="obj-row">
+        <div class="obj-objecion">"Quiero usar mi auto en parte de pago"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 18</strong> / Parte de pago — Grupo Americar vs otra automotora.</div>
+      </div>
+      <div class="obj-row">
+        <div class="obj-objecion">"¿Qué pasa en la inspección?"</div>
+        <div class="obj-arrow">→</div>
+        <div class="obj-respuesta"><strong style="color:var(--teal)">Slide 22</strong> / Detalle inspección — 10 a 45 minutos, visual y/o mecánica.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 17: DOCUMENTOS ATRASADOS Y AUTO CON FALLA ═══════════════════ -->
+<div class="slide s-navy" id="s17" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Casos especiales — condición del auto</div>
+  <h2 class="h1" style="margin-bottom:10px">Condición del auto: <span class="o">¿cómo responder?</span></h2>
+  <div class="cols2" style="gap:16px">
+    <div class="card co" style="padding:16px">
+      <h3 style="color:var(--orange);margin-bottom:10px">📄 Cliente indica que los documentos están atrasados</h3>
+      <div class="scr" style="font-size:12px;background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2)"><span class="scr-lbl" style="color:var(--orange)">Script completo</span>"Sí, podemos comprar tu auto, pero debes tener presente que sin la documentación al día NO podremos realizar la prueba de ruta, por lo que se aplicará un descuento ante la posibilidad de eventuales fallas mecánicas. También podrás evaluar la opción de actualizar los documentos y luego vender tu auto. Siempre nuestros compradores te ayudarán a buscar la mejor alternativa para la venta de tu vehículo y recuerda que aceptar nuestra cita no te compromete a vender — siempre la última palabra la tienes TÚ."</div>
+      <div style="margin-top:10px;background:rgba(230,57,70,.08);border-radius:8px;padding:8px 12px">
+        <p style="font-size:11.5px;color:var(--light)"><strong style="color:var(--accent)">⚠️ Nota:</strong> Este punto NO aplica para inspecciones en Movicenter — la prueba de ruta es interna.</p>
+      </div>
+    </div>
+    <div class="card ca" style="padding:16px">
+      <h3 style="color:var(--accent);margin-bottom:10px">🔧 Cliente indica espontáneamente que el auto tiene una falla</h3>
+      <p style="font-size:12px;color:var(--light);margin-bottom:8px">Indagar qué tipo de falla: choque leve, luz airbag/Check engine encendido en tablero.</p>
+      <div style="background:rgba(245,166,35,.08);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:7px 12px;margin-bottom:8px">
+        <p style="font-size:11.5px;color:var(--light)">→ Aplicar script de <strong style="color:var(--orange)">Oferta en Vivo</strong></p>
+        <p style="font-size:11.5px;color:var(--light);margin-top:4px">"Dadas las condiciones de tu auto, podemos ofrecerte nuestra Oferta en Vivo."</p>
+      </div>
+      <div class="scr" style="font-size:11px"><span class="scr-lbl">Script inspección (cuando cliente pregunta)</span>"La inspección puede durar de 10 a 45 minutos aproximadamente. El tipo de revisión lo determina el estado del vehículo — puede ser solo visual y/o mecánica y de ruta. Si es solo visual, la revisión en detalle se realiza solo si aceptas la oferta inicial. Al terminar te entregamos la oferta final de compra. Solo si aceptas se transfiere el dinero a tu cuenta y en el mismo lugar se firma la documentación (<strong style="color:var(--orange)">DEBES CONOCER TU CLAVE ÚNICA</strong>)."</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 18: PAGO MÚLTIPLE + PARTE DE PAGO + RENOVAR ═══════════════ -->
+<div class="slide s-navy2" id="s18" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Casos especiales — pago y motivación de venta</div>
+  <h2 class="h1" style="margin-bottom:10px">Preguntas de <span class="g">pago</span> y renovación</h2>
+  <div class="cols3" style="margin-bottom:12px">
+    <div class="card ct" style="padding:14px">
+      <h3 style="color:var(--teal);margin-bottom:8px">👥 ¿Pago a más de una persona?</h3>
+      <p style="font-size:12px;color:var(--light);line-height:1.6"><strong style="color:#fff">PUNTO 1:</strong> Para compras normales el pago es a cuenta(s) del titular del auto (mismo RUT dueño y CAV). Si tiene más de una cuenta, todas deben coincidir en RUT.</p>
+      <div style="margin-top:8px;background:rgba(61,217,160,.08);border-radius:6px;padding:6px 10px">
+        <p style="font-size:11px;color:var(--light)">Si se vende por poder, el pago se realiza al titular del CAV con el RUT que figura en el CAV.</p>
+      </div>
+    </div>
+    <div class="card co" style="padding:14px">
+      <h3 style="color:var(--orange);margin-bottom:8px">💳 Cliente quiere dejar auto en parte de pago</h3>
+      <div style="background:rgba(61,217,160,.08);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:7px 10px;margin-bottom:8px">
+        <p style="font-size:11.5px;color:var(--light)"><strong style="color:var(--teal)">SI ES AUTOMOTORA DEL GRUPO AMERICAR:</strong> el dinero se puede transferir directamente de CLICAR a la automotora → ventajoso, se aplican beneficios.</p>
+      </div>
+      <div style="background:rgba(230,57,70,.08);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:7px 10px">
+        <p style="font-size:11.5px;color:var(--light)"><strong style="color:var(--accent)">SI ES OTRA AUTOMOTORA:</strong> NO SE PUEDE — el pago se realiza directo al dueño del auto (condiciones PUNTO 1).</p>
+      </div>
+    </div>
+    <div class="card cg" style="padding:14px">
+      <h3 style="color:var(--green);margin-bottom:8px">🔄 Cliente quiere vender para renovar su auto</h3>
+      <div class="scr" style="font-size:11px"><span class="scr-lbl">INDICAR OBLIGATORIAMENTE</span>"Perfecto, entonces inicia el proceso con la agenda de tu cita y elige la sucursal de tu preferencia. En nuestro sitio web, podrás revisar nuestra variada gama de vehículos — contamos con más de <strong>3.000 autos en stock</strong>. Puedes elegir cualquiera de nuestro catálogo, optar a convenientes precios e incluso tener financiamiento. Recuerda que la decisión final siempre es tuya."</div>
+    </div>
+  </div>
+  <div style="background:rgba(230,57,70,.08);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:8px 14px">
+    <p style="font-size:12px;color:#fff"><strong style="color:var(--accent)">IMPORTANTE:</strong> Si cliente indica que quiere vender para renovar su vehículo, DEBES mencionar esta parte obligatoriamente.</p>
+  </div>
+</div>
+
+<!-- ══ SLIDE 19: FILTRO CATMAN — LAS 6 PREGUNTAS ═══════════════════════ -->
+<div class="slide s-blue" id="s19" style="justify-content:flex-start;padding-top:2.5vh">
+  <div class="tag">Filtro CATMAN — ¡Sí, quiero venderlo!</div>
+  <h2 class="h1" style="margin-bottom:8px">Revisión CATMAN: <span class="t">¿B2C o Subasta?</span></h2>
+  <div class="scr" style="margin-bottom:10px"><span class="scr-lbl">Indicar al cliente</span>"Perfecto, necesitamos hacer unas preguntas para poder concretar y avanzar con el proceso."</div>
+  <div class="cols2" style="gap:14px">
+    <!-- COLUMNA IZQUIERDA: Preguntas 1, 2, 3 -->
+    <div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">Preguntas 1 – 3</p>
+      <div class="flt-step" style="border-left-color:var(--teal);background:rgba(61,217,160,.06)">
+        <p style="font-size:12px;color:#fff;font-weight:700;margin-bottom:4px">1. ¿Tu auto se conduce con licencia clase B?</p>
+        <p style="font-size:11px;color:var(--light)">✅ SÍ → pasa a la siguiente pregunta</p>
+        <p style="font-size:11px;color:var(--light)">❌ NO → <em style="color:var(--accent);font-style:normal">"En Clicar solo compramos vehículos que se conducen exclusivamente con clase B. Agradecemos tu tiempo."</em> — DESPEDIDA</p>
+      </div>
+      <div class="flt-step" style="border-left-color:var(--orange);background:rgba(245,166,35,.06)">
+        <p style="font-size:12px;color:#fff;font-weight:700;margin-bottom:4px">2. ¿Tu auto mantiene vigente encargo por robo?</p>
+        <p style="font-size:10.5px;color:var(--gray);margin-bottom:4px">(En certificado de anotaciones vigente, NO debe figurar)</p>
+        <p style="font-size:11px;color:var(--light)">✅ NO tiene encargo → pasa a la siguiente pregunta</p>
+        <p style="font-size:11px;color:var(--light)">❌ SÍ tiene encargo → <em style="color:var(--accent);font-style:normal">"Te recomendamos hacer el trámite de levantamiento del encargo por robo."</em> — DESPEDIDA</p>
+      </div>
+      <div class="flt-step" style="border-left-color:var(--accent);background:rgba(230,57,70,.06)">
+        <p style="font-size:12px;color:#fff;font-weight:700;margin-bottom:4px">3. ¿Tu auto ha sido comprado en remate?</p>
+        <p style="font-size:11px;color:var(--light)">✅ NO → pasa a la siguiente pregunta</p>
+        <p style="font-size:11px;color:var(--light)">❌ SÍ → <em style="color:var(--accent);font-style:normal">"Lo siento, en CLICAR no compramos vehículos rematados."</em> — DESPEDIDA</p>
+        <p style="font-size:10.5px;color:var(--gray);margin-top:4px">Si no sabe: buscar por PPU en aach.cl/conRemate</p>
+      </div>
+    </div>
+    <!-- COLUMNA DERECHA: Preguntas 4, 5 y 6 (camioneta) -->
+    <div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">Preguntas 4 – 6</p>
+      <div class="flt-step" style="border-left-color:var(--green);background:rgba(110,231,183,.06)">
+        <p style="font-size:12px;color:#fff;font-weight:700;margin-bottom:4px">4. ¿El auto está inscrito a tu nombre hace más de 30 días?</p>
+        <p style="font-size:10.5px;color:var(--gray);margin-bottom:4px">(Si se compró nuevo, no aplica esta restricción)</p>
+        <p style="font-size:11px;color:var(--light)">✅ SÍ → pasa a la siguiente pregunta</p>
+        <p style="font-size:11px;color:var(--light)">❌ NO → <em style="color:var(--accent);font-style:normal">"No compramos con inscripción menor a 30 días — contáctanos cuando cumplas los 30 días."</em> — DESPEDIDA</p>
+      </div>
+      <div class="flt-step" style="border-left-color:var(--teal);background:rgba(61,217,160,.06)">
+        <p style="font-size:12px;color:#fff;font-weight:700;margin-bottom:4px">5. ¿Tu auto tiene prenda? (Crédito automotriz)</p>
+        <p style="font-size:11px;color:var(--light)">✅ NO → <strong style="color:var(--green)">SE PROGRAMA UNA CITA</strong></p>
+        <p style="font-size:11px;color:var(--light)">❌ SÍ → "¿Con qué entidad tienes el crédito?" → Ver tabla slide siguiente</p>
+      </div>
+      <div class="card co" style="padding:12px;margin-top:8px">
+        <h3 style="color:var(--orange);margin-bottom:6px;font-size:10px">Solo si el vehículo es CAMIONETA:</h3>
+        <div class="flt-step" style="border-left-color:var(--orange);background:rgba(245,166,35,.06);margin-bottom:0">
+          <p style="font-size:12px;color:#fff;font-weight:700;margin-bottom:4px">6. ¿Tu camioneta tuvo o tiene equipamiento minero?</p>
+          <p style="font-size:10.5px;color:var(--gray);margin-bottom:4px">(Barra antivuelcos interna y externa, color rojo con reflectantes)</p>
+          <p style="font-size:11px;color:var(--light)">✅ NO → Se programa una cita (puede tener barra, pero no minera)</p>
+          <p style="font-size:11px;color:var(--light)">❌ SÍ o NO SABE → <strong style="color:var(--orange)">Oferta en Vivo</strong> — ver slide siguiente</p>
+        </div>
+      </div>
+      <div style="background:rgba(61,217,160,.06);border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:8px 12px;margin-top:8px">
+        <p style="font-size:11.5px;color:var(--light)"><strong style="color:var(--teal)">Nota:</strong> Si las respuestas cambian respecto a la conversación inicial, cancelar cita.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 20: TABLA PRENDAS ════════════════════════════════════════════ -->
+<div class="slide s-navy" id="s20" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Filtro CATMAN — Pregunta 5: Prenda</div>
+  <h2 class="h1" style="margin-bottom:10px">Auto con <span class="o">prenda</span>: ¿con qué entidad?</h2>
+  <div style="margin-bottom:10px">
+    <p style="font-size:12.5px;color:var(--light);margin-bottom:4px">Si la entidad <strong style="color:var(--teal)">ESTÁ en la tabla:</strong> informar al cliente que debe solicitar el <strong style="color:#fff">CERTIFICADO DE PREPAGO</strong> con un mínimo de 5 días hábiles de vigencia.</p>
+    <p style="font-size:12.5px;color:var(--light)">Si la entidad <strong style="color:var(--accent)">NO está en la tabla:</strong> no trabajamos con esa financiera — no se puede seguir con el proceso.</p>
+  </div>
+  <div style="overflow-x:auto;flex:1">
+    <table class="fin-table">
+      <thead>
+        <tr>
+          <th>Financiera</th>
+          <th>Fecha de Toma</th>
+          <th>Forma de Pago</th>
+          <th>Condición</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>AUTOFIN</td><td>5 días Hábiles</td><td>transferencia</td><td>con proyección</td></tr>
+        <tr><td>BKSPA</td><td>5 días Hábiles</td><td>transferencia</td><td>solo con cupón de pago</td></tr>
+        <tr><td>EUROCAPITAL</td><td>5 días Hábiles</td><td>transferencia</td><td>con proyección</td></tr>
+        <tr><td>FORUM</td><td>5 días Hábiles</td><td>transferencia</td><td>con proyección</td></tr>
+        <tr><td>GLOBAL</td><td>5 días Hábiles</td><td>transferencia</td><td>con proyección</td></tr>
+        <tr><td>GMAC (CHEVROLET)</td><td>5 días Hábiles</td><td>transferencia</td><td>se debe adjuntar el certificado de la financiera</td></tr>
+        <tr><td>MARUBENI</td><td>5 días Hábiles</td><td>transferencia</td><td>liquidación de prepago</td></tr>
+        <tr><td>MUNDO CREDITO</td><td>5 días Hábiles</td><td>transferencia</td><td>con proyección</td></tr>
+        <tr><td>NUEVA CAPITAL</td><td>5 días Hábiles</td><td>transferencia</td><td>liquidación de prepago</td></tr>
+        <tr><td>OLX FINANCIERA</td><td>5 días Hábiles</td><td>transferencia</td><td>liquidación de prepago</td></tr>
+        <tr><td>SANTANDER</td><td>5 días Hábiles</td><td>transferencia</td><td>se debe adjuntar el certificado de la financiera</td></tr>
+        <tr><td>TANNER</td><td>5 días Hábiles</td><td>transferencia</td><td>liquidación de prepago</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:10px;background:rgba(230,57,70,.08);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:8px 14px">
+    <p style="font-size:12px;color:#fff"><strong style="color:var(--accent)">⛔ No trabajamos con:</strong> Falabella, Scotiabank, Migrantes, Crediautos, MAF ni AUTOMOTORAS.</p>
+  </div>
+</div>
+
+<!-- ══ SLIDE 21: ¿PASA EL FILTRO? B2C VS OFERTA EN VIVO ═══════════════ -->
+<div class="slide s-navy2" id="s21" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Si responde todo OK — ¡PASA EL FILTRO!</div>
+  <h2 class="h1" style="margin-bottom:12px">¡Pasa el filtro! <span class="g">¿B2C o Oferta en Vivo?</span></h2>
+  <div class="cols2" style="gap:16px">
+    <div class="card cg" style="padding:16px">
+      <h3 style="color:var(--green);margin-bottom:10px">✅ Revisión CATMAN indica VENTA B2C → CONTINUAR</h3>
+      <div class="step" style="border-left-color:var(--teal)">
+        <div class="step-n" style="background:var(--teal);color:#0c2838">1</div>
+        <div class="step-t"><strong>¿Me das tu nombre y primer apellido, por favor?</strong></div>
+      </div>
+      <div class="step" style="border-left-color:var(--teal)">
+        <div class="step-n" style="background:var(--teal);color:#0c2838">2</div>
+        <div class="step-t"><strong>¿Me darías la patente de tu auto?</strong><br><span style="font-size:11px;color:var(--gray)">Si dice NO: "La patente es de conocimiento público y nos permite entregar una oferta adecuada."</span></div>
+      </div>
+      <div class="step" style="border-left-color:var(--teal)">
+        <div class="step-n" style="background:var(--teal);color:#0c2838">3</div>
+        <div class="step-t"><strong>¿Dónde te encuentras ubicado?</strong><br><span style="font-size:11px;color:var(--gray)">Para buscar la sucursal más cercana. Ofertar puntos según ubicación — cercanos o de preferencia del cliente.</span></div>
+      </div>
+    </div>
+    <div class="card co" style="padding:16px">
+      <h3 style="color:var(--orange);margin-bottom:10px">🔄 Revisión CATMAN indica OFERTA EN VIVO → PASA A SLIDE SIGUIENTE</h3>
+      <p style="font-size:12px;color:var(--light);margin-bottom:10px;font-weight:700">Casos que derivan a Oferta en Vivo:</p>
+      <div class="step" style="border-left-color:var(--orange)">
+        <div class="step-n" style="background:var(--orange)">→</div>
+        <div class="step-t">Auto con km &gt; 150.000 o año 2008-2011</div>
+      </div>
+      <div class="step" style="border-left-color:var(--orange)">
+        <div class="step-n" style="background:var(--orange)">→</div>
+        <div class="step-t">Camioneta con equipamiento minero (o no sabe)</div>
+      </div>
+      <div class="step" style="border-left-color:var(--orange)">
+        <div class="step-n" style="background:var(--orange)">→</div>
+        <div class="step-t">Auto con falla mecánica visible (choque leve, airbag/check engine)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 22: OFERTA EN VIVO ════════════════════════════════════════════ -->
+<div class="slide s-blue" id="s22" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Revisión CATMAN indica Oferta en Vivo</div>
+  <h2 class="h1" style="margin-bottom:10px">Oferta en Vivo: <span class="o">cómo explicarla</span></h2>
+  <div class="cols2" style="gap:16px">
+    <div>
+      <div class="scr"><span class="scr-lbl">Script para el cliente</span>"Por las características de tu vehículo, podemos ofrecerte nuestra <strong>Oferta en Vivo</strong>, donde publicaremos tu auto en una de nuestras plataformas online para recibir la oferta de más de 200 Dealers aliados, sin que esto implique gasto alguno para ti.<br><br>En la sucursal de tu elección te entregaremos el precio base por el cual tu auto será ofertado. Si estás de acuerdo, se realizará la inspección en detalle — pudiendo variar el precio según el estado de tu vehículo. Una vez de acuerdo, se lleva a cabo la oferta ONLINE y en <strong>30 minutos o 19 horas</strong> un ejecutivo de CLICAR te contactará con el resultado. Serás tú quien tome la decisión de vender o no, pudiendo desistir en cualquier instancia del proceso.<br><br>Esta opción no te obliga a vender ni garantiza la compra. Siempre la decisión es tuya."</div>
+    </div>
+    <div>
+      <div class="card co" style="padding:14px;margin-bottom:10px">
+        <h3 style="color:var(--orange);margin-bottom:8px">Beneficios de la Oferta en Vivo</h3>
+        <ul style="list-style:none;margin-top:4px">
+          <li style="font-size:12px;color:var(--light);padding:4px 0;display:flex;gap:8px"><span>📡</span> Exposición a más de 200 dealers</li>
+          <li style="font-size:12px;color:var(--light);padding:4px 0;display:flex;gap:8px"><span>⚡</span> Rapidez y seguridad para ti y tu vehículo</li>
+          <li style="font-size:12px;color:var(--light);padding:4px 0;display:flex;gap:8px"><span>💼</span> Si tiene prenda o multa también lo gestionamos</li>
+          <li style="font-size:12px;color:var(--light);padding:4px 0;display:flex;gap:8px"><span>🎯</span> Tú determinas si quieres cerrar — ¡la última palabra es tuya!</li>
+        </ul>
+        <div style="margin-top:8px;background:rgba(230,57,70,.1);border-radius:6px;padding:6px 10px">
+          <p style="font-size:11.5px;color:#fca5a5;font-weight:700">⚠️ OFERTA EN VIVO NO APLICA BONOS</p>
+        </div>
+      </div>
+      <div class="scr" style="font-size:11.5px"><span class="scr-lbl">Confirmar agenda</span>"¿Te gustaría agendar bajo esta modalidad?"<br><br>✅ SÍ → Continuar con nombre, patente, ubicación y datos de cita.<br>❌ NO → "Entendemos, muchas gracias por escogernos como una opción para vender tu auto." — Despedida.</div>
+      <div style="margin-top:8px;background:rgba(230,57,70,.08);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:8px 12px">
+        <p style="font-size:11.5px;color:#fff"><strong style="color:var(--accent)">INDICAR:</strong> El día de la cita debe asistir el dueño del auto con cédula vigente (o persona con poder específico para venta de auto), así pueda firmar documentos de autorización.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 23: NO SHOW / RESCATE ═════════════════════════════════════════ -->
+<div class="slide s-navy2" id="s23" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Gestión No Show / Rescate — cita no asistida</div>
+  <h2 class="h1" style="margin-bottom:10px">No Show / Rescate: <span class="g">recuperar la agenda</span></h2>
+  <div style="background:rgba(245,166,35,.08);border-left:4px solid var(--orange);border-radius:0 10px 10px 0;padding:8px 16px;margin-bottom:10px">
+    <p style="font-size:12px;color:#fff"><strong style="color:var(--orange)">Atención:</strong> Este flujo aplica para clientes que tenían una cita agendada y no se presentaron. Ya existe relación previa — el tono es diferente al primer contacto.</p>
+  </div>
+  <div class="cols2" style="gap:16px">
+    <div>
+      <div class="scr" style="margin-bottom:10px"><span class="scr-lbl">Apertura No Show</span>"Hola buenos días/tardes, estoy llamando desde CLICAR, mi nombre es [NOMBRE APELLIDO]. Me comunico contigo para consultar cómo te fue en la cita [FECHA SUCURSAL]."</div>
+      <div class="card cg" style="padding:12px;margin-bottom:8px">
+        <h3 style="color:var(--green);margin-bottom:6px">✅ Cliente confirma asistencia</h3>
+        <p style="font-size:12px;color:var(--light)">Se da aviso al punto de caso mal gestionado. (El cliente SÍ fue pero algo salió mal en la sucursal)</p>
+      </div>
+      <div class="card ca" style="padding:12px">
+        <h3 style="color:var(--accent);margin-bottom:6px">❌ Cliente indica que NO ASISTIÓ</h3>
+        <div class="scr" style="font-size:11.5px;background:rgba(230,57,70,.05);border-color:rgba(230,57,70,.2)"><span class="scr-lbl" style="color:#fca5a5">Script</span>"¿Serías tan amable de indicarnos el motivo principal de tu inasistencia? Esto nos ayudará a entregarte mejores alternativas de atención, ofertas, horarios y alternativas para reagendar tu visita — ya que queremos retomar esta agenda en la fecha y sucursal que sea de tu preferencia."</div>
+      </div>
+    </div>
+    <div>
+      <div class="card co" style="padding:14px">
+        <h3 style="color:var(--orange);margin-bottom:8px">💬 Cliente tiene mejor oferta o precio no atractivo</h3>
+        <div class="scr" style="font-size:11.5px"><span class="scr-lbl">Script de recuperación</span>"Ten presente que siempre intentaremos llegar al mejor precio. El precio final se entrega al momento de la inspección y tenemos opción de aplicar bonos y otras ofertas que harán más atractivo el precio final.<br><br>Por ejemplo, esta semana podemos entregar, adicional al precio de página, un <strong>bono de $200.000</strong> si concretas la venta. Además, al precio de venta se agregará un premio de $50.000 solo por tu asistencia en fecha y hora indicada. <strong style="color:var(--orange)">¿PODEMOS CONTAR CON TU COMPROMISO?</strong> Así uno de nuestros técnicos estará esperándote.<br><br>Aceptar la cita no te compromete a vender y es completamente gratuito."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 24: CONFIRMACIÓN DE CITA ═════════════════════════════════════ -->
+<div class="slide s-navy" id="s24" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Uso esporádico — Confirmación de Cita</div>
+  <h2 class="h1" style="margin-bottom:10px">Confirmación de Cita <span style="color:var(--gray);font-size:.65em;font-weight:400">— uso esporádico</span></h2>
+  <div style="background:rgba(245,166,35,.08);border-left:4px solid var(--orange);border-radius:0 10px 10px 0;padding:8px 16px;margin-bottom:10px">
+    <p style="font-size:12px;color:#fff"><strong style="color:var(--orange)">Uso esporádico:</strong> Esta gestión la realiza el Contact Center solo cuando el cliente agendó directamente en el sitio web o en casos específicos. No es parte del flujo regular.</p>
+  </div>
+  <div class="cols2" style="gap:16px">
+    <div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">Agenda Web — 1 Día Antes</p>
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;margin-bottom:8px">
+        <p style="font-size:11.5px;color:var(--light);font-weight:700;margin-bottom:6px">Datos a confirmar:</p>
+        <ul style="list-style:none">
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal)">→</span> Nombre y Apellido</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal)">→</span> Marca y Modelo</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal)">→</span> Año <span style="color:var(--gray);font-size:10.5px">(Si aplica Oferta en Vivo: dejar en comentarios, NO mencionar al cliente)</span></li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal)">→</span> Kilometraje <span style="color:var(--gray);font-size:10.5px">(Si aplica OEV: dejar en comentarios, NO mencionar)</span></li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal)">→</span> Patente (si no está ingresada)</li>
+        </ul>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px">
+        <p style="font-size:11.5px;color:var(--light);font-weight:700;margin-bottom:6px">Confirmar detalles de la cita:</p>
+        <ul style="list-style:none">
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--orange)">→</span> Lugar con dirección y referencias</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--orange)">→</span> Fecha y hora</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Confirmación — 6 preguntas filtro</p>
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;margin-bottom:8px">
+        <ul style="list-style:none">
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal);font-weight:700">1.</span> ¿Licencia clase B?</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal);font-weight:700">2.</span> ¿Encargo por robo vigente?</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal);font-weight:700">3.</span> ¿Comprado en remate?</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal);font-weight:700">4.</span> ¿Inscrito más de 30 días?</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal);font-weight:700">5.</span> ¿Tiene prenda?</li>
+          <li style="font-size:12px;color:var(--light);padding:3px 0;display:flex;gap:6px"><span style="color:var(--teal);font-weight:700">6.</span> (Camioneta) ¿Equipamiento minero?</li>
+        </ul>
+        <p style="font-size:11px;color:var(--gray);margin-top:6px">Si las respuestas cambian, cancelar cita.</p>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;margin-bottom:8px">
+        <p style="font-size:11.5px;color:var(--light);font-weight:700;margin-bottom:6px">Documentos que debe traer:</p>
+        <p style="font-size:11px;color:var(--light);line-height:1.7">Cédula vigente o poder notarial · Clave Única · Revisión técnica · Permiso de circulación · SOAP · Segunda llave (si tiene) · Kit de emergencia · Registro mantenciones (solo concesionario oficial) · Factura (si año en curso o anterior) · Certificado de no deuda o Prepago (según corresponda)</p>
+      </div>
+      <div style="background:rgba(245,166,35,.08);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:7px 12px">
+        <p style="font-size:11px;color:var(--light)">Si hay intención de rechazo o consulta por precio — ver script de recuperación en Slide No Show/Rescate.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 25: PROTOCOLO MÍNIMO DESCARGABLE ══════════════════════════════ -->
+<div class="slide s-navy2" id="s25" style="justify-content:flex-start;padding-top:3vh">
+  <div class="tag">Protocolo mínimo · Descargable</div>
+  <h2 class="h1" style="margin-bottom:10px">Tu tarjeta de <span class="t">escritorio</span> —<br><span style="color:var(--light);font-size:.75em;font-weight:400">7 pasos que no pueden faltar en ninguna llamada</span></h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+    <div style="display:flex;flex-direction:column;gap:5px;grid-column:span 2">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(21,128,61,.08);border:1.5px solid rgba(21,128,61,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">📞</span>
+          <div><strong style="font-size:11px;color:#86efac">1. Abre con el auto</strong><br><span style="font-size:10px;color:var(--light)">"...Vi que tasaste tu [Marca Modelo Año]..."</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(21,128,61,.08);border:1.5px solid rgba(21,128,61,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">😊</span>
+          <div><strong style="font-size:11px;color:#86efac">2. Tono asesor</strong><br><span style="font-size:10px;color:var(--light)">Sonríe — se escucha. No de cobranza.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(29,78,216,.08);border:1.5px solid rgba(29,78,216,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">💬</span>
+          <div><strong style="font-size:11px;color:#93c5fd">3. Pregunta motivación</strong><br><span style="font-size:10px;color:var(--light)">"¿Qué te motivó a tasar el auto?"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(29,78,216,.08);border:1.5px solid rgba(29,78,216,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">⏰</span>
+          <div><strong style="font-size:11px;color:#93c5fd">4. Detecta urgencia</strong><br><span style="font-size:10px;color:var(--light)">"¿Para cuándo?" · "¿Eres el titular?"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(124,58,237,.08);border:1.5px solid rgba(124,58,237,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">🗓️</span>
+          <div><strong style="font-size:11px;color:#c4b5fd">5. Vende la cita</strong><br><span style="font-size:10px;color:var(--light)">"20 min, sin costo — confirma o mejora tu precio"</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(124,58,237,.08);border:1.5px solid rgba(124,58,237,.3);border-radius:8px;padding:7px 10px">
+          <span style="font-size:1.1rem;flex-shrink:0">🔄</span>
+          <div><strong style="font-size:11px;color:#c4b5fd">6. Al primer "no": no te rindas</strong><br><span style="font-size:10px;color:var(--light)">Rebate con día o sucursal alternativa.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(5,150,105,.08);border:1.5px solid rgba(5,150,105,.4);border-radius:8px;padding:7px 10px;grid-column:span 2">
+          <span style="font-size:1.1rem;flex-shrink:0">✅</span>
+          <div><strong style="font-size:11px;color:#6ee7b7">7. Confirma y cierra</strong><br><span style="font-size:10px;color:var(--light)">Confirma día · hora · sucursal · dirección. Repite su nombre al despedirte.</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:14px;border:1px solid rgba(255,255,255,.07)">
+      <div style="font-size:3rem">🖨️</div>
+      <h3 style="font-size:15px;font-weight:800;color:#fff;line-height:1.2">Descarga la tarjeta<br>para tu escritorio</h3>
+      <p style="font-size:11.5px;color:var(--light);line-height:1.4">Formato <strong style="color:#fff">media carta · fondo blanco</strong> — imprime y tenla al lado del teléfono.</p>
+      <button class="btn-dl" onclick="descargarTarjeta()">⬇ Descargar PNG</button>
+      <p style="font-size:10px;color:var(--gray)">También puedes imprimir desde el navegador</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 26: CIERRE / CALL TO ACTION ══════════════════════════════════ -->
+<div class="slide s-cover" id="s26" style="justify-content:center;text-align:left">
+  <div style="position:absolute;right:0;top:0;bottom:0;width:38%;background:linear-gradient(90deg,transparent,rgba(61,217,160,.05));pointer-events:none"></div>
+  <div class="tag">Tu misión en cada llamada</div>
+  <h1 style="font-size:clamp(28px,4vw,54px);font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:18px">
+    Una llamada.<br>
+    <span style="color:var(--am-cyan)">Una cita agendada.</span><br>
+    <span style="font-size:.65em;color:var(--light);font-weight:400">El resto lo hace el equipo comercial.</span>
+  </h1>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:800px;margin-bottom:18px">
+    <div style="background:rgba(255,255,255,.05);border-top:3px solid #86efac;border-radius:10px;padding:12px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;color:#86efac;text-transform:uppercase;margin-bottom:4px">Pilar A</p>
+      <p style="font-size:12.5px;color:#fff;font-weight:700">Nombra el auto.<br>Sí o sí.</p>
+    </div>
+    <div style="background:rgba(255,255,255,.05);border-top:3px solid #93c5fd;border-radius:10px;padding:12px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;color:#93c5fd;text-transform:uppercase;margin-bottom:4px">Pilar B</p>
+      <p style="font-size:12.5px;color:#fff;font-weight:700">Pregunta antes<br>de proponer.</p>
+    </div>
+    <div style="background:rgba(255,255,255,.05);border-top:3px solid #c4b5fd;border-radius:10px;padding:12px">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;color:#c4b5fd;text-transform:uppercase;margin-bottom:4px">Pilar C</p>
+      <p style="font-size:12.5px;color:#fff;font-weight:700">Vende el beneficio.<br>Insiste dos veces.</p>
+    </div>
+  </div>
+  <div class="quote-box" style="max-width:640px">
+    <blockquote>"La velocidad ya la tienes. Lo que cambia el resultado es el tono, la pregunta correcta y no rendirse al primer no."</blockquote>
+    <cite>Basado en el análisis de 97 llamadas sin agenda · JUN 2026 · Americar Compra · V2</cite>
+  </div>
+  <div class="badge-row" style="margin-top:14px">
+    <span class="badge">✅ 23 min contacto promedio</span>
+    <span class="badge">🎯 1 cita = tu objetivo</span>
+    <span class="badge">📞 Solo teléfono — tu voz es todo</span>
+    <span class="badge" style="background:rgba(61,217,160,.12);border-color:var(--teal);color:var(--teal)">V2 · JUN 2026</span>
+  </div>
+</div>
+</div><!-- /presentation -->
+
+<div id="nav">
+  <button onclick="move(-1)">← Anterior</button>
+  <span id="ctr">1 / 26</span>
+  <button onclick="move(1)">Siguiente →</button>
+</div>
+
+<!-- SCRIPT PLACEHOLDER -->
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+const total = slides.length;
+function show(n) {
+  slides[cur].classList.remove('active');
+  cur = (n + total) % total;
+  slides[cur].classList.add('active');
+  document.getElementById('ctr').textContent = (cur+1) + ' / ' + total;
+  document.getElementById('progress').style.width = ((cur+1)/total*100) + '%';
+}
+function move(d) { show(cur + d); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') move(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   move(-1);
+});
+show(0);
+
+function descargarTarjeta() {
+  const overlay = document.getElementById('modal-overlay');
+  const card = document.getElementById('cheatcard');
+  overlay.classList.add('open');
+  setTimeout(() => {
+    html2canvas(card, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      width: card.offsetWidth,
+      height: card.offsetHeight
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'Protocolo_Minimo_Llamada_Americar.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  }, 200);
+}
+function cerrarModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+document.querySelectorAll('.acc-card').forEach(card => {
+  card.querySelector('.acc-trigger').addEventListener('click', () => {
+    card.classList.toggle('open');
+  });
+});
+</script>
+</body>
+</html>
